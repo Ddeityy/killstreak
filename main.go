@@ -16,7 +16,7 @@ func main() {
 	demo := internal.Demo{}
 	err := json.Unmarshal([]byte(data), &demo)
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Fatalf("Failed to unmarshal demo: %s", err)
 	}
 	steamId := internal.GetUserSteamId()
 	playerId := demo.GetPlayerId(steamId)
