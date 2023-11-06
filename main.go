@@ -3,8 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 )
 
@@ -67,6 +70,25 @@ func parseDemo(demoPath string) string {
 	return out.String()
 }
 
+func findSteamId() string {
+	homeDir := os.Getenv("HOME")
+	steamPath := path.Join(homeDir, ".steam", "steam")
+	file, err := os.ReadDir(path.Join(steamPath, "userdata"))
+	if err != nil {
+		log.Println(err)
+	}
+	return fmt.Sprintf("[U:1:%s]", file[0].Name())
+}
+
+func findPlayerId(demo Demo, steamId string) int {
+	for _, v := range demo.Users {
+		if v.SteamId == steamId {
+			return v.UserId
+		}
+	}
+	return 0
+}
+
 // get user's steamID using tf2 appmanifest: LastUser
 
 func main() {
@@ -77,8 +99,10 @@ func main() {
 	if err != nil {
 		return
 	}
-	// test
 	log.Println(demo.Users[3].Name)
 	log.Println(demo.Users[3].SteamId)
 	log.Println(demo.Deaths[0].Killer, demo.Deaths[0].Weapon, demo.Deaths[0].Victim, demo.Deaths[0].Tick)
+	steamid := findSteamId()
+	userid := findPlayerId(demo, steamid)
+	fmt.Println(userid)
 }
