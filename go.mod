@@ -1,8 +1,10 @@
 module killstreak
 
-go 1.21.0
+go 1.21.1
 
-require github.com/ddeityy/steamlocate-go v0.0.0-20231106000039-8fc25d306583
+toolchain go1.21.3
+
+require github.com/ddeityy/steamlocate-go v0.0.0-20231106142149-c269c3100c3f
 
 require (
 	github.com/andygrunwald/vdf v1.1.0 // indirect
