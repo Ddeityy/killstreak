@@ -8,27 +8,30 @@ import (
 	"strings"
 )
 
-type Kill struct {
-	Tick float64
-}
-
+// Main player struct to retrieve killstreaks
 type Player struct {
 	DemoName    string
 	UserId      int
 	Kills       []Kill
 	Killstreaks []Killstreak
+	MainClass   string // Most spawned as class
 }
 
 type Killstreak struct {
 	Kills     []Kill
 	StartTick float64
 	EndTick   float64
-	Length    float64
+	Length    float64 // Seconds
+}
+
+type Kill struct {
+	Tick float64
 }
 
 const killInterval = 15.0 // P-REC default = 15.0
-const tick = 0.015
+const tick = 0.015        // Amount of seconds per tick
 
+// Populates the kills, mainclass and demoname fields
 func (p *Player) GetPlayerKills(d Demo, demoPath string) {
 	var userKills []Kill
 	for _, v := range d.Deaths {
@@ -38,10 +41,12 @@ func (p *Player) GetPlayerKills(d Demo, demoPath string) {
 			}
 		}
 	}
+	p.MainClass = d.getPlayerClass(p.UserId)
 	p.Kills = userKills
 	p.DemoName = trimDemoName(demoPath)
 }
 
+// Returns the demo name without path and extension
 func trimDemoName(demoPath string) string {
 	demoName := strings.Split(demoPath, "/")
 	demoName = demoName[len(demoName)-1:]
@@ -49,10 +54,7 @@ func trimDemoName(demoPath string) string {
 	return strings.TrimSuffix(demoNameStrip, ".dem")
 }
 
-func NewPlayer(playerId int) Player {
-	return Player{UserId: playerId}
-}
-
+// Finds all killstreaks
 func (p *Player) FindKillstreaks() {
 
 	lastKill := p.Kills[0]
@@ -60,9 +62,9 @@ func (p *Player) FindKillstreaks() {
 	killstreak := Killstreak{StartTick: lastKill.Tick}
 
 	for _, currentKill := range p.Kills[1:] {
-
 		timeBetweenKills := (currentKill.Tick - lastKill.Tick) * tick
 		killstreak.Kills = append(killstreak.Kills, lastKill)
+
 		if timeBetweenKills <= killInterval {
 			killstreak.EndTick = currentKill.Tick
 		} else {
@@ -77,6 +79,7 @@ func (p *Player) FindKillstreaks() {
 	p.printKillstreaks()
 }
 
+// Replaces default killstreak logs with custom ones in _event.txt
 func (p *Player) WriteKillstreaksToEvents() {
 	demosDir := GetDemosDir()
 	eventsFile := path.Join(demosDir, "_events.txt")
@@ -92,7 +95,16 @@ func (p *Player) WriteKillstreaksToEvents() {
 			if strings.Contains(line, p.DemoName) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					lines[i] = fmt.Sprintf(`%s Killstreak %v ("%v" %v - %v [%.2f seconds])`, prefix, len(k.Kills), p.DemoName, k.StartTick, k.EndTick, k.Length)
+					lines[i] = fmt.Sprintf(
+						`%s Killstreak %v as %v ("%v" %v - %v [%.2f seconds])`,
+						prefix,
+						len(k.Kills),
+						p.MainClass,
+						p.DemoName,
+						k.StartTick,
+						k.EndTick,
+						k.Length,
+					)
 				}
 			}
 		}
@@ -111,6 +123,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 	}
 }
 
+// Removes duplicate killstreaks and keeps the separator
 func removeDuplicateLines(s []string) []string {
 	inResult := make(map[string]bool)
 	var result []string
@@ -124,6 +137,7 @@ func removeDuplicateLines(s []string) []string {
 	return result
 }
 
+// Pretty prints killstreak info
 func (p *Player) printKillstreaks() {
 	for i, v := range p.Killstreaks {
 		log.Println("-------------")

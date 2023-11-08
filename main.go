@@ -1,8 +1,6 @@
 package main
 
-import (
-	"killstreak/internal"
-)
+import "killstreak/internal"
 
 func main() {
 	steamdId := internal.GetUserSteamId()

@@ -17,6 +17,7 @@ import (
 
 // get user's steamID using tf2 appmanifest: LastUser
 
+// Returns the absolute path of /demos
 func GetDemosDir() string {
 	steamdir := steamlocate.SteamDir{}
 	steamdir.Locate()
@@ -28,6 +29,7 @@ func GetDemosDir() string {
 	return demosDir
 }
 
+// Process demo and write the result to _events.txt
 func ProcessDemo(demoPath string, steamId string) {
 	data := ParseDemo(demoPath)
 	demo := Demo{}
@@ -36,12 +38,9 @@ func ProcessDemo(demoPath string, steamId string) {
 		log.Println("Parse error:", err)
 	}
 
-	playerId, err := demo.GetPlayerId(steamId)
-	if err != nil {
-		log.Println(err)
-	}
+	playerId := demo.GetPlayerId(steamId)
 
-	p := NewPlayer(playerId)
+	p := Player{UserId: playerId}
 	p.GetPlayerKills(demo, demoPath)
 	if len(p.Kills) == 0 {
 		log.Println("No kills found - bookmark")
@@ -51,6 +50,7 @@ func ProcessDemo(demoPath string, steamId string) {
 	p.WriteKillstreaksToEvents()
 }
 
+// Watch for inotify events and process new demos
 func WatchDemosDir(demosDir string, steamId string) {
 	watcher, err := inotify.NewWatcher()
 	if err != nil {
@@ -77,6 +77,7 @@ func WatchDemosDir(demosDir string, steamId string) {
 					log.Println("Demo deleted:", err)
 					break
 				}
+				log.Println("Processing demo:", trimDemoName(event.Name))
 				ProcessDemo(event.Name, steamId)
 			}
 		case err := <-watcher.Error:
@@ -85,6 +86,7 @@ func WatchDemosDir(demosDir string, steamId string) {
 	}
 }
 
+// Returns the steamID(V3) from userdata directory
 func GetUserSteamId() string {
 	s := steamlocate.SteamDir{}
 	s.Locate()
@@ -95,6 +97,7 @@ func GetUserSteamId() string {
 	return fmt.Sprintf("[U:1:%s]", file[0].Name())
 }
 
+// Parses demo and returns a JSON string to unmarshal
 func ParseDemo(demoPath string) string {
 	parserPath, err := filepath.Abs("parse_demo")
 	if err != nil {
