@@ -1,5 +1,7 @@
 package internal
 
+import "errors"
+
 type Chat struct {
 	Kind string  `json:"kind"`
 	From string  `json:"from"`
@@ -38,11 +40,11 @@ type Demo struct {
 	StartTick float64       `json:"startTick"`
 }
 
-func (d *Demo) GetPlayerId(steamId string) int {
+func (d *Demo) GetPlayerId(steamId string) (int, error) {
 	for _, v := range d.Users {
 		if v.SteamId == steamId {
-			return v.UserId
+			return v.UserId, nil
 		}
 	}
-	return 0
+	return 0, errors.New("could match steamID to demo")
 }

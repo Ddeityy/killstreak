@@ -4,7 +4,10 @@ go 1.21.1
 
 toolchain go1.21.3
 
-require github.com/ddeityy/steamlocate-go v0.0.0-20231106142149-c269c3100c3f
+require (
+	github.com/ddeityy/steamlocate-go v0.0.0-20231106142149-c269c3100c3f
+	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
+)
 
 require (
 	github.com/andygrunwald/vdf v1.1.0 // indirect

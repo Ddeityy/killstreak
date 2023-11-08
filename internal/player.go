@@ -2,6 +2,9 @@ package internal
 
 import (
 	"log"
+	"os"
+	"path"
+	"strings"
 )
 
 type Kill struct {
@@ -9,6 +12,7 @@ type Kill struct {
 }
 
 type Player struct {
+	DemoName    string
 	UserId      int
 	Kills       []Kill
 	Killstreaks []Killstreak
@@ -24,7 +28,7 @@ type Killstreak struct {
 const killInterval = 15.0 // P-REC default = 15.0
 const tick = 0.015
 
-func (p *Player) GetPlayerKills(d Demo) {
+func (p *Player) GetPlayerKills(d Demo, demoPath string) {
 	var userKills []Kill
 	for _, v := range d.Deaths {
 		if v.Killer != v.Victim {
@@ -33,10 +37,15 @@ func (p *Player) GetPlayerKills(d Demo) {
 			}
 		}
 	}
-	if len(userKills) == 0 {
-		log.Panicln("No kills found")
-	}
 	p.Kills = userKills
+	p.DemoName = trimDemoName(demoPath)
+}
+
+func trimDemoName(demoPath string) string {
+	demoName := strings.Split(demoPath, "/")
+	demoName = demoName[len(demoName)-1:]
+	demoNameStrip := demoName[0]
+	return strings.TrimSuffix(demoNameStrip, ".dem")
 }
 
 func NewPlayer(playerId int) Player {
@@ -52,24 +61,44 @@ func (p *Player) FindKillstreaks() {
 	for _, currentKill := range p.Kills[1:] {
 
 		timeBetweenKills := (currentKill.Tick - lastKill.Tick) * tick
-		log.Println("Seconds since last kill: ", timeBetweenKills)
-
 		killstreak.Kills = append(killstreak.Kills, lastKill)
-		log.Println(len(killstreak.Kills), " kills")
 		if timeBetweenKills <= killInterval {
 			killstreak.EndTick = currentKill.Tick
 		} else {
 			if len(killstreak.Kills) >= 4 {
 				killstreak.Length = (killstreak.EndTick - killstreak.StartTick) * tick
 				p.Killstreaks = append(p.Killstreaks, killstreak)
-				log.Printf("Added killstreak: %+v", killstreak)
 			}
 			killstreak = Killstreak{StartTick: currentKill.Tick}
-			log.Println("Resetting killstreak")
 		}
 		lastKill = currentKill
 	}
 	p.printKillstreaks()
+}
+
+func (p *Player) WriteKillstreaksToEvents() {
+	demosDir := GetDemosDir()
+	file, err := os.ReadFile(path.Join(demosDir, "_events.txt"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	lines := strings.Split(string(file), "\n") // ">"?
+
+	for i, line := range lines {
+		if strings.Contains(line, "Killstreak") {
+			if strings.Contains(line, p.DemoName) {
+				oldLine := lines[i][19:]
+				log.Println(oldLine)
+			}
+		}
+	}
+	output := strings.Join(lines, "\n")
+	err = os.WriteFile("myfile", []byte(output), 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 }
 
 func (p *Player) printKillstreaks() {
