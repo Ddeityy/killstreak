@@ -46,7 +46,9 @@ func ProcessDemo(demoPath string, steamId string) {
 		log.Println("No kills found - bookmark")
 		return
 	}
+	log.Println("Gettinng killstreaks")
 	p.FindKillstreaks()
+	log.Println("Writing killstreaks")
 	p.WriteKillstreaksToEvents()
 }
 
@@ -72,7 +74,7 @@ func WatchDemosDir(demosDir string, steamId string) {
 				}
 				log.Println("Finished writing:", event.Name)
 				// Check if demo was auto-deleted by ds_stop
-				time.Sleep(time.Millisecond * 1)
+				time.Sleep(time.Millisecond * 100)
 				if _, err := os.Stat(event.Name); os.IsNotExist(err) {
 					log.Println("Demo deleted:", err)
 					break

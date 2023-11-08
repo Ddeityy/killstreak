@@ -76,7 +76,6 @@ func (p *Player) FindKillstreaks() {
 		}
 		lastKill = currentKill
 	}
-	p.printKillstreaks()
 }
 
 // Replaces default killstreak logs with custom ones in _event.txt
@@ -88,6 +87,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 		log.Fatalf("%v", err)
 	}
 
+	log.Println("Reading _events.txt")
 	lines := strings.Split(string(file), "\n")
 
 	for i, line := range lines {
@@ -111,16 +111,13 @@ func (p *Player) WriteKillstreaksToEvents() {
 	}
 	lines = removeDuplicateLines(lines)
 
-	for i, line := range lines {
-		fmt.Println(i, line)
-	}
-
 	output := strings.Join(lines, "\n")
 
 	err = os.WriteFile(eventsFile, []byte(output), 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	log.Printf("Finished: %+v", p.Killstreaks)
 }
 
 // Removes duplicate killstreaks and keeps the separator
@@ -135,23 +132,4 @@ func removeDuplicateLines(s []string) []string {
 		}
 	}
 	return result
-}
-
-// Pretty prints killstreak info
-func (p *Player) printKillstreaks() {
-	for i, v := range p.Killstreaks {
-		log.Println("-------------")
-		log.Printf("Killstreak %v \n", i+1)
-		log.Printf("%v seconds long\n", v.Length)
-		lastKill := 0.0
-		for i, kill := range v.Kills {
-			if lastKill == 0.0 {
-				log.Printf("Kill %v - %v [-0 seconds]", i+1, kill.Tick)
-				lastKill = kill.Tick
-				continue
-			}
-			log.Printf("Kill %v - %v [-%.2f seconds]", i+1, kill.Tick, (kill.Tick-lastKill)*tick)
-			lastKill = kill.Tick
-		}
-	}
 }
