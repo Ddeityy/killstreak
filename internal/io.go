@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"time"
 
 	"github.com/ddeityy/steamlocate-go"
 	"k8s.io/utils/inotify"
@@ -28,7 +29,7 @@ func GetDemosDir() string {
 }
 
 func ProcessDemo(demoPath string, steamId string) {
-	data := ParseDemo("demos/one.dem")
+	data := ParseDemo(demoPath)
 	demo := Demo{}
 	err := json.Unmarshal([]byte(data), &demo)
 	if err != nil {
@@ -61,7 +62,7 @@ func WatchDemosDir(demosDir string, steamId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	log.Println("Watching", demosDir)
 	for {
 		select {
 		case event := <-watcher.Event:
@@ -71,7 +72,7 @@ func WatchDemosDir(demosDir string, steamId string) {
 				}
 				log.Println("Finished writing:", event.Name)
 				// Check if demo was auto-deleted by ds_stop
-				// time.Sleep(time.Millisecond * 1)
+				time.Sleep(time.Millisecond * 1)
 				if _, err := os.Stat(event.Name); os.IsNotExist(err) {
 					log.Println("Demo deleted:", err)
 					break

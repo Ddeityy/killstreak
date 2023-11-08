@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -78,27 +79,49 @@ func (p *Player) FindKillstreaks() {
 
 func (p *Player) WriteKillstreaksToEvents() {
 	demosDir := GetDemosDir()
-	file, err := os.ReadFile(path.Join(demosDir, "_events.txt"))
+	eventsFile := path.Join(demosDir, "_events.txt")
+	file, err := os.ReadFile(eventsFile)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("%v", err)
 	}
 
-	lines := strings.Split(string(file), "\n") // ">"?
+	lines := strings.Split(string(file), "\n")
 
 	for i, line := range lines {
 		if strings.Contains(line, "Killstreak") {
 			if strings.Contains(line, p.DemoName) {
-				oldLine := lines[i][19:]
-				log.Println(oldLine)
+				prefix := line[:18]
+				for _, k := range p.Killstreaks {
+					lines[i] = fmt.Sprintf(`%s Killstreak %v ("%v" %v - %v [%.2f seconds])`, prefix, len(k.Kills), p.DemoName, k.StartTick, k.EndTick, k.Length)
+				}
 			}
 		}
 	}
+	lines = removeDuplicateLines(lines)
+
+	for i, line := range lines {
+		fmt.Println(i, line)
+	}
+
 	output := strings.Join(lines, "\n")
-	err = os.WriteFile("myfile", []byte(output), 0644)
+
+	err = os.WriteFile(eventsFile, []byte(output), 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
 
+func removeDuplicateLines(s []string) []string {
+	inResult := make(map[string]bool)
+	var result []string
+	for _, str := range s {
+		if _, ok := inResult[str]; !ok {
+			inResult[str] = true
+			result = append(result, str)
+			delete(inResult, ">")
+		}
+	}
+	return result
 }
 
 func (p *Player) printKillstreaks() {
