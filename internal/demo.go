@@ -2,6 +2,25 @@ package internal
 
 // Main struct of the entire demo file
 type Demo struct {
+	Header Header `json:"header"`
+	State  State  `json:"state"`
+}
+
+type Header struct {
+	DemoType string  `json:"demo_type"`
+	Version  int     `json:"version"`
+	Protocol int     `json:"protocol"`
+	Server   string  `json:"server"`
+	Nick     string  `json:"nick"`
+	Map      string  `json:"map"`
+	Game     string  `json:"game"`
+	Duration float64 `json:"duration"`
+	Ticks    int     `json:"ticks"`
+	Frames   int     `json:"frames"`
+	Signon   int     `json:"signon"`
+}
+
+type State struct {
 	Chat      []Chat        `json:"chat"`
 	Users     map[int]Users `json:"users"`
 	Deaths    []Deaths      `json:"deaths"`
@@ -44,7 +63,7 @@ type Rounds struct {
 
 // Returns player's userId in the demo
 func (d *Demo) GetPlayerId(steamId string) int {
-	for _, v := range d.Users {
+	for _, v := range d.State.Users {
 		if v.SteamId == steamId {
 			return v.UserId
 		}
@@ -70,7 +89,7 @@ var classes = map[int]string{
 func (d *Demo) getPlayerClass(userId int) string {
 	maxNum := 0
 	result := 0
-	for _, user := range d.Users {
+	for _, user := range d.State.Users {
 		if user.UserId == userId {
 			for k, v := range user.Classes {
 				if v > maxNum {

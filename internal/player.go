@@ -34,10 +34,10 @@ const tick = 0.015        // Amount of seconds per tick
 // Populates the kills, mainclass and demoname fields
 func (p *Player) GetPlayerKills(d Demo, demoPath string) {
 	var userKills []Kill
-	for _, v := range d.Deaths {
+	for _, v := range d.State.Deaths {
 		if v.Killer != v.Victim {
 			if v.Killer == p.UserId {
-				userKills = append(userKills, Kill{Tick: v.Tick - d.StartTick})
+				userKills = append(userKills, Kill{Tick: v.Tick - d.State.StartTick})
 			}
 		}
 	}
