@@ -3,7 +3,6 @@ package internal
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -30,7 +29,7 @@ func GetDemosDir() string {
 }
 
 // Process demo and write the result to _events.txt
-func ProcessDemo(demoPath string, steamId string) {
+func ProcessDemo(demoPath string) {
 	data := ParseDemo(demoPath)
 	demo := Demo{}
 	err := json.Unmarshal([]byte(data), &demo)
@@ -38,12 +37,10 @@ func ProcessDemo(demoPath string, steamId string) {
 		log.Println("Parse error:", err)
 	}
 
-	playerId := demo.GetPlayerId(steamId)
-
-	p := Player{UserId: playerId}
+	p := Player{Username: demo.Header.Nick, MapName: demo.Header.Map, UserId: demo.GetUserId()}
 	p.GetPlayerKills(demo, demoPath)
 	if len(p.Kills) == 0 {
-		log.Println("No kills found - bookmark")
+		log.Println("Only bookmards found.")
 		return
 	}
 	log.Println("Gettinng killstreaks")
@@ -53,7 +50,7 @@ func ProcessDemo(demoPath string, steamId string) {
 }
 
 // Watch for inotify events and process new demos
-func WatchDemosDir(demosDir string, steamId string) {
+func WatchDemosDir(demosDir string) {
 	watcher, err := inotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -80,23 +77,12 @@ func WatchDemosDir(demosDir string, steamId string) {
 					break
 				}
 				log.Println("Processing demo:", trimDemoName(event.Name))
-				ProcessDemo(event.Name, steamId)
+				ProcessDemo(event.Name)
 			}
 		case err := <-watcher.Error:
 			log.Println("Error:", err)
 		}
 	}
-}
-
-// Returns the steamID(V3) from userdata directory
-func GetUserSteamId() string {
-	s := steamlocate.SteamDir{}
-	s.Locate()
-	file, err := os.ReadDir(path.Join(s.Path, "userdata"))
-	if err != nil {
-		log.Println(err)
-	}
-	return fmt.Sprintf("[U:1:%s]", file[0].Name())
 }
 
 // Parses demo and returns a JSON string to unmarshal

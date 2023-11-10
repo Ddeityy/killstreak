@@ -62,16 +62,16 @@ type Rounds struct {
 }
 
 // Returns player's userId in the demo
-func (d *Demo) GetPlayerId(steamId string) int {
+func (d *Demo) GetUserId() int {
 	for _, v := range d.State.Users {
-		if v.SteamId == steamId {
+		if v.Name == d.Header.Nick {
 			return v.UserId
 		}
 	}
 	return 0
 }
 
-// Class enums given by demo parser
+// Class enum given by demo parser
 var classes = map[int]string{
 	0: "other",
 	1: "scout",
@@ -88,7 +88,7 @@ var classes = map[int]string{
 // Returns player's most used class
 func (d *Demo) getPlayerClass(userId int) string {
 	maxNum := 0
-	result := 0
+	var result int
 	for _, user := range d.State.Users {
 		if user.UserId == userId {
 			for k, v := range user.Classes {

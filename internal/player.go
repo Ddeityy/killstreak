@@ -11,7 +11,9 @@ import (
 // Main player struct to retrieve killstreaks
 type Player struct {
 	DemoName    string
+	Username    string
 	UserId      int
+	MapName     string
 	Kills       []Kill
 	Killstreaks []Killstreak
 	MainClass   string // Most spawned as class
@@ -80,8 +82,9 @@ func (p *Player) FindKillstreaks() {
 
 // Replaces default killstreak logs with custom ones in _event.txt
 func (p *Player) WriteKillstreaksToEvents() {
-	demosDir := GetDemosDir()
-	eventsFile := path.Join(demosDir, "_events.txt")
+	//demosDir := GetDemosDir()
+	eventsFile := path.Join("test", "_events.txt")
+	//eventsFile := path.Join(demosDir, "_events.txt")
 	file, err := os.ReadFile(eventsFile)
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -95,6 +98,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 			if strings.Contains(line, p.DemoName) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
+					lines[i-1] = fmt.Sprintf(">\n%v %v", prefix, p.MapName)
 					lines[i] = fmt.Sprintf(
 						`%s Killstreak %v as %v ("%v" %v - %v [%.2f seconds])`,
 						prefix,
