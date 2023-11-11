@@ -4,6 +4,7 @@ package internal
 type Demo struct {
 	Header Header `json:"header"`
 	State  State  `json:"state"`
+	Player Player
 }
 
 type Header struct {
@@ -61,6 +62,7 @@ type Rounds struct {
 	EndTick int     `json:"end_tick"`
 }
 
+<<<<<<< Updated upstream
 // Returns player's userId in the demo
 func (d *Demo) GetUserId() int {
 	for _, v := range d.State.Users {
@@ -72,6 +74,9 @@ func (d *Demo) GetUserId() int {
 }
 
 // Class enum given by demo parser
+=======
+// Class enums given by demo parser
+>>>>>>> Stashed changes
 var classes = map[int]string{
 	0: "other",
 	1: "scout",
@@ -85,12 +90,22 @@ var classes = map[int]string{
 	9: "engineer",
 }
 
+// Returns player's userId in the demo
+func (d *Demo) GetPlayerId(steamId string) int {
+	for _, v := range d.State.Users {
+		if v.SteamId == d.Player.Username {
+			return v.UserId
+		}
+	}
+	return 0
+}
+
 // Returns player's most used class
-func (d *Demo) getPlayerClass(userId int) string {
+func (d *Demo) getPlayerClass() string {
 	maxNum := 0
 	var result int
 	for _, user := range d.State.Users {
-		if user.UserId == userId {
+		if user.UserId == d.Player.UserId {
 			for k, v := range user.Classes {
 				if v > maxNum {
 					maxNum = v

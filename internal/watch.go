@@ -6,27 +6,11 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"time"
 
-	"github.com/ddeityy/steamlocate-go"
 	"k8s.io/utils/inotify"
 )
-
-// get user's steamID using tf2 appmanifest: LastUser
-
-// Returns the absolute path of /demos
-func GetDemosDir() string {
-	steamdir := steamlocate.SteamDir{}
-	steamdir.Locate()
-	demosDir := steamdir.SteamApps.Apps[440].Path
-	demosDir = path.Join(demosDir, "tf", "demos")
-	if _, err := os.Stat(demosDir); os.IsNotExist(err) {
-		log.Fatalf("Demos folder doesn't exist: %v", err)
-	}
-	return demosDir
-}
 
 // Process demo and write the result to _events.txt
 func ProcessDemo(demoPath string) {

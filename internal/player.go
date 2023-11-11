@@ -43,17 +43,9 @@ func (p *Player) GetPlayerKills(d Demo, demoPath string) {
 			}
 		}
 	}
-	p.MainClass = d.getPlayerClass(p.UserId)
+	p.MainClass = d.getPlayerClass()
 	p.Kills = userKills
 	p.DemoName = trimDemoName(demoPath)
-}
-
-// Returns the demo name without path and extension
-func trimDemoName(demoPath string) string {
-	demoName := strings.Split(demoPath, "/")
-	demoName = demoName[len(demoName)-1:]
-	demoNameStrip := demoName[0]
-	return strings.TrimSuffix(demoNameStrip, ".dem")
 }
 
 // Finds all killstreaks
