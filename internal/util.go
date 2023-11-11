@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"log"
-	"os"
 	"path"
 	"strings"
 
@@ -15,9 +13,6 @@ func GetDemosDir() string {
 	steamdir.Locate()
 	demosDir := steamdir.SteamApps.Apps[440].Path
 	demosDir = path.Join(demosDir, "tf", "demos")
-	if _, err := os.Stat(demosDir); os.IsNotExist(err) {
-		log.Fatalf("Demos folder doesn't exist: %v", err)
-	}
 	return demosDir
 }
 

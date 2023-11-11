@@ -58,7 +58,7 @@ func (p *Player) GetUserId() {
 }
 
 // Finds all killstreaks
-func (p *Player) FindKillstreaks() {
+func (p *Player) GetUserKillstreaks() {
 
 	lastKill := p.Kills[0]
 
@@ -83,12 +83,12 @@ func (p *Player) FindKillstreaks() {
 
 // Replaces default killstreak logs with custom ones in _event.txt
 func (p *Player) WriteKillstreaksToEvents() {
-	//demosDir := GetDemosDir()
-	eventsFile := path.Join("test", "_events.txt")
-	//eventsFile := path.Join(demosDir, "_events.txt")
+	demosDir := GetDemosDir()
+	eventsFile := path.Join(demosDir, "_events.txt")
+
 	file, err := os.ReadFile(eventsFile)
 	if err != nil {
-		log.Fatalf("%v", err)
+		log.Printf("%v", err)
 	}
 
 	log.Println("Reading _events.txt")
@@ -120,7 +120,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 
 	err = os.WriteFile(eventsFile, []byte(output), 0644)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
 }

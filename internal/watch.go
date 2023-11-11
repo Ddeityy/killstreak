@@ -22,36 +22,41 @@ func ProcessDemo(demoPath string) {
 	}
 
 	p := Player{Username: demo.Header.Nick, MapName: demo.Header.Map, Demo: &demo}
+
+	demo.Player = p
+
 	log.Println("Processing kills")
-	p.processKills()
+	demo.Player.processKills()
 }
 
 func (p *Player) processKills() {
 	p.GetUserId()
 	p.GetPlayerKills()
-	if len(p.Kills) == 0 {
-		log.Println("No killstreaks found. Exiting.")
+	p.GetUserKillstreaks()
+	if len(p.Killstreaks) == 0 {
+		log.Println("No killstreaks found.")
 		p.WriteKillstreaksToEvents()
 		return
 	}
-	log.Println("Gettinng killstreaks")
-	p.FindKillstreaks()
 	log.Println("Writing killstreaks")
 	p.WriteKillstreaksToEvents()
 }
 
 // Watch for inotify events and process new demos
-func WatchDemosDir(demosDir string) {
+func WatchDemosDir() {
 	watcher, err := inotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer watcher.Close()
 
+	demosDir := GetDemosDir()
+
 	err = watcher.Watch(demosDir)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	log.Println("Watching", demosDir)
 	for {
 		select {

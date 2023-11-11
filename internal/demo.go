@@ -78,7 +78,7 @@ var classes = map[int]string{
 }
 
 // Returns player's userId in the demo
-func (d *Demo) GetPlayerId(steamId string) int {
+func (d *Demo) GetUserId(steamId string) int {
 	for _, v := range d.State.Users {
 		if v.SteamId == d.Player.Username {
 			return v.UserId
