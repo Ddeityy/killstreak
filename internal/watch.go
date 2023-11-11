@@ -15,16 +15,23 @@ import (
 // Process demo and write the result to _events.txt
 func ProcessDemo(demoPath string) {
 	data := ParseDemo(demoPath)
-	demo := Demo{}
+	demo := Demo{Path: demoPath}
 	err := json.Unmarshal([]byte(data), &demo)
 	if err != nil {
 		log.Println("Parse error:", err)
 	}
 
-	p := Player{Username: demo.Header.Nick, MapName: demo.Header.Map, UserId: demo.GetUserId()}
-	p.GetPlayerKills(demo, demoPath)
+	p := Player{Username: demo.Header.Nick, MapName: demo.Header.Map, Demo: &demo}
+	log.Println("Processing kills")
+	p.processKills()
+}
+
+func (p *Player) processKills() {
+	p.GetUserId()
+	p.GetPlayerKills()
 	if len(p.Kills) == 0 {
-		log.Println("Only bookmards found.")
+		log.Println("No killstreaks found. Exiting.")
+		p.WriteKillstreaksToEvents()
 		return
 	}
 	log.Println("Gettinng killstreaks")

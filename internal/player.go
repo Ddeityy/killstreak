@@ -10,6 +10,7 @@ import (
 
 // Main player struct to retrieve killstreaks
 type Player struct {
+	Demo        *Demo
 	DemoName    string
 	Username    string
 	UserId      int
@@ -34,18 +35,26 @@ const killInterval = 15.0 // P-REC default = 15.0
 const tick = 0.015        // Amount of seconds per tick
 
 // Populates the kills, mainclass and demoname fields
-func (p *Player) GetPlayerKills(d Demo, demoPath string) {
+func (p *Player) GetPlayerKills() {
 	var userKills []Kill
-	for _, v := range d.State.Deaths {
+	for _, v := range p.Demo.State.Deaths {
 		if v.Killer != v.Victim {
 			if v.Killer == p.UserId {
-				userKills = append(userKills, Kill{Tick: v.Tick - d.State.StartTick})
+				userKills = append(userKills, Kill{Tick: v.Tick - p.Demo.State.StartTick})
 			}
 		}
 	}
-	p.MainClass = d.getPlayerClass()
+	p.MainClass = p.Demo.getPlayerClass()
 	p.Kills = userKills
-	p.DemoName = trimDemoName(demoPath)
+	p.DemoName = trimDemoName(p.Demo.Path)
+}
+
+func (p *Player) GetUserId() {
+	for _, v := range p.Demo.State.Users {
+		if v.Name == p.Username {
+			p.UserId = v.UserId
+		}
+	}
 }
 
 // Finds all killstreaks

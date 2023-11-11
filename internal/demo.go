@@ -2,6 +2,7 @@ package internal
 
 // Main struct of the entire demo file
 type Demo struct {
+	Path   string
 	Header Header `json:"header"`
 	State  State  `json:"state"`
 	Player Player
@@ -62,21 +63,7 @@ type Rounds struct {
 	EndTick int     `json:"end_tick"`
 }
 
-<<<<<<< Updated upstream
-// Returns player's userId in the demo
-func (d *Demo) GetUserId() int {
-	for _, v := range d.State.Users {
-		if v.Name == d.Header.Nick {
-			return v.UserId
-		}
-	}
-	return 0
-}
-
-// Class enum given by demo parser
-=======
 // Class enums given by demo parser
->>>>>>> Stashed changes
 var classes = map[int]string{
 	0: "other",
 	1: "scout",
