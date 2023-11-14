@@ -1,4 +1,6 @@
 #!/usr/bin/bash
+echo "Killing old service"
+systemctl --user -M $SUDO_USER@ stop killstreak.service
 echo "Copying the executables"
 cp bin/killstreak /home/$SUDO_USER/.local/share/
 cp bin/parse_demo /home/$SUDO_USER/.local/share/
