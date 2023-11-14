@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -83,11 +84,18 @@ func WatchDemosDir() {
 
 // Parses demo and returns a JSON string to unmarshal
 func ParseDemo(demoPath string) string {
-	parserPath, err := filepath.Abs("parse_demo")
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	parserPath, err := filepath.Abs(path.Join(homeDir, ".local", "share", "parse_demo"))
 	if err != nil {
 		log.Println(err)
 	}
+
 	command := exec.Command(parserPath, demoPath)
+
 	var out bytes.Buffer
 
 	command.Stdout = &out
