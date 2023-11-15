@@ -11,7 +11,7 @@ sudo bash -c 'cat' << EOF > /etc/systemd/user/killstreak.service
 Description=Killstreak service
 [Service]
 ExecStart=/home/$SUDO_USER/.local/share/killstreak
-Restart=on-failure
+Restart=always
 [Install]
 WantedBy=default.target
 EOF
