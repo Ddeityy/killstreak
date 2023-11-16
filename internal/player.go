@@ -1,13 +1,5 @@
 package internal
 
-import (
-	"fmt"
-	"log"
-	"os"
-	"path"
-	"strings"
-)
-
 // Main player struct to retrieve killstreaks
 type Player struct {
 	Demo        *Demo
@@ -81,58 +73,15 @@ func (p *Player) GetUserKillstreaks() {
 	}
 }
 
-// Replaces default killstreak logs with custom ones in _event.txt
-func (p *Player) WriteKillstreaksToEvents() {
-	demosDir := GetDemosDir()
-	eventsFile := path.Join(demosDir, "_events.txt")
-
-	file, err := os.ReadFile(eventsFile)
-	if err != nil {
-		log.Printf("%v", err)
-	}
-
-	log.Println("Reading _events.txt")
-	lines := strings.Split(string(file), "\n")
-
-	for i, line := range lines {
-		if strings.Contains(line, "Killstreak") {
-			if strings.Contains(line, p.DemoName) {
-				prefix := line[:18]
-				for _, k := range p.Killstreaks {
-					lines[i-1] = fmt.Sprintf(">\n%v %v %v", prefix, p.MapName, p.MainClass)
-					lines[i] = fmt.Sprintf(
-						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
-						prefix,
-						len(k.Kills),
-						p.DemoName,
-						k.StartTick,
-						k.EndTick,
-						k.Length,
-					)
-				}
-			}
-		}
-	}
-	lines = removeDuplicateLines(lines)
-
-	output := strings.Join(lines, "\n")
-
-	err = os.WriteFile(eventsFile, []byte(output), 0644)
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("Finished: %+v", p.Killstreaks)
-}
-
 // Removes duplicate killstreaks and keeps the separator
-func removeDuplicateLines(s []string) []string {
+func removeDuplicateLines(s []string, separator string) []string {
 	inResult := make(map[string]bool)
 	var result []string
 	for _, str := range s {
 		if _, ok := inResult[str]; !ok {
 			inResult[str] = true
 			result = append(result, str)
-			delete(inResult, ">")
+			delete(inResult, separator)
 		}
 	}
 	return result

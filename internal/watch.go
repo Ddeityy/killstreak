@@ -1,3 +1,6 @@
+//go:build linux
+// +build linux
+
 package internal
 
 import (
@@ -8,9 +11,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"time"
-
-	"k8s.io/utils/inotify"
 )
 
 // Process demo and write the result to _events.txt
@@ -41,45 +41,6 @@ func (p *Player) processKills() {
 	}
 	log.Println("Writing killstreaks")
 	p.WriteKillstreaksToEvents()
-}
-
-// Watch for inotify events and process new demos
-func WatchDemosDir() {
-	watcher, err := inotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer watcher.Close()
-
-	demosDir := GetDemosDir()
-
-	err = watcher.Watch(demosDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Watching", demosDir)
-	for {
-		select {
-		case event := <-watcher.Event:
-			if event.Mask == inotify.InCloseWrite {
-				if event.Name[len(event.Name)-4:] != ".dem" {
-					break
-				}
-				log.Println("Finished writing:", event.Name)
-				// Check if demo was auto-deleted by ds_stop
-				time.Sleep(time.Millisecond * 100)
-				if _, err := os.Stat(event.Name); os.IsNotExist(err) {
-					log.Println("Demo deleted:", err)
-					break
-				}
-				log.Println("Processing demo:", trimDemoName(event.Name))
-				ProcessDemo(event.Name)
-			}
-		case err := <-watcher.Error:
-			log.Println("Error:", err)
-		}
-	}
 }
 
 // Parses demo and returns a JSON string to unmarshal
