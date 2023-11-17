@@ -42,7 +42,7 @@ func (p *Player) GetPlayerKills() error {
 		}
 	}
 	if len(p.Kills) <= 3 {
-		return errors.New("Less than 3 kills found, aborting")
+		return errors.New("less than 3 kills found, aborting")
 	}
 	p.MainClass = p.Demo.getPlayerClass()
 	p.Kills = userKills
