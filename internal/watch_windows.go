@@ -58,7 +58,7 @@ func WatchDemosDir() {
 			}
 		}
 	}()
-	err = watcher.Add(`C:\Users\Level - рабочий\Desktop\Даниил\go\killstreak\test_data\windows`)
+	err = watcher.Add(`test_data\windows`)
 	//	err = watcher.Add(demosDir)
 	if err != nil {
 		log.Fatal(err)

@@ -47,7 +47,7 @@ func WatchDemosDir() {
 					log.Println("Demo deleted:", err)
 					break
 				}
-				log.Println("Processing demo:", trimDemoName(event.Name))
+				log.Println("Processing demo:", TrimDemoName(event.Name))
 				ProcessDemo(event.Name)
 			}
 		case err := <-watcher.Error:
@@ -68,7 +68,7 @@ func getDemosDir() string {
 // TODO add "playdemo $demopath; demo_gototick $tick 0 (offset) 1 (pause)"
 // Replaces default killstreak logs with custom ones in _event.txt
 func (p *Player) WriteKillstreaksToEvents() {
-	demosDir := GetDemosDir()
+	demosDir := getDemosDir()
 	eventsFile := path.Join(demosDir, "_events.txt")
 
 	file, err := os.ReadFile(eventsFile)
@@ -116,10 +116,7 @@ func ParseDemo(demoPath string) string {
 		panic(err)
 	}
 
-	parserPath, err := path.Join(homeDir, ".local", "share", "parse_demo")
-	if err != nil {
-		log.Println(err)
-	}
+	parserPath := path.Join(homeDir, ".local", "share", "parse_demo")
 
 	command := exec.Command(parserPath, demoPath)
 
