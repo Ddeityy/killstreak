@@ -4,13 +4,16 @@
 package internal
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"time"
 
+	"github.com/ddeityy/steamlocate-go"
 	"k8s.io/utils/inotify"
 )
 
@@ -22,7 +25,7 @@ func WatchDemosDir() {
 	}
 	defer watcher.Close()
 
-	demosDir := GetDemosDir()
+	demosDir := getDemosDir()
 
 	err = watcher.Watch(demosDir)
 	if err != nil {
@@ -51,6 +54,15 @@ func WatchDemosDir() {
 			log.Println("Error:", err)
 		}
 	}
+}
+
+// Returns the absolute path of /demos
+func getDemosDir() string {
+	steamdir := steamlocate.SteamDir{}
+	steamdir.Locate()
+	demosDir := steamdir.SteamApps.Apps[440].Path
+	demosDir = path.Join(demosDir, "tf", "demos")
+	return demosDir
 }
 
 // TODO add "playdemo $demopath; demo_gototick $tick 0 (offset) 1 (pause)"
@@ -95,4 +107,28 @@ func (p *Player) WriteKillstreaksToEvents() {
 		log.Println(err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
+}
+
+// Parses demo and returns a JSON string to unmarshal
+func ParseDemo(demoPath string) string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	parserPath, err := path.Join(homeDir, ".local", "share", "parse_demo")
+	if err != nil {
+		log.Println(err)
+	}
+
+	command := exec.Command(parserPath, demoPath)
+
+	var out bytes.Buffer
+
+	command.Stdout = &out
+	err = command.Run()
+	if err != nil {
+		log.Println(err)
+	}
+	return out.String()
 }

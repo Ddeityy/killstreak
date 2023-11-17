@@ -1,5 +1,10 @@
 package internal
 
+import (
+	"errors"
+	"log"
+)
+
 // Main player struct to retrieve killstreaks
 type Player struct {
 	Demo        *Demo
@@ -27,7 +32,7 @@ const killInterval = 15.0 // P-REC default = 15.0
 const tick = 0.015        // Amount of seconds per tick
 
 // Populates the kills, mainclass and demoname fields
-func (p *Player) GetPlayerKills() {
+func (p *Player) GetPlayerKills() error {
 	var userKills []Kill
 	for _, v := range p.Demo.State.Deaths {
 		if v.Killer != v.Victim {
@@ -36,9 +41,26 @@ func (p *Player) GetPlayerKills() {
 			}
 		}
 	}
+	if len(p.Kills) <= 3 {
+		return errors.New("Less than 3 kills found, aborting")
+	}
 	p.MainClass = p.Demo.getPlayerClass()
 	p.Kills = userKills
-	p.DemoName = trimDemoName(p.Demo.Path)
+	p.DemoName = TrimDemoName(p.Demo.Path)
+	return nil
+}
+
+func (p *Player) processKills() {
+	p.GetUserId()
+	err := p.GetPlayerKills()
+	if err != nil {
+		log.Println("Formatting.")
+		p.WriteKillstreaksToEvents()
+		return
+	}
+	p.GetUserKillstreaks()
+	log.Println("Formatting and writing killstreaks")
+	p.WriteKillstreaksToEvents()
 }
 
 func (p *Player) GetUserId() {
