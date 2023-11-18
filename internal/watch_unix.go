@@ -132,3 +132,13 @@ func ParseDemo(demoPath string) string {
 	}
 	return out.String()
 }
+
+func CutDemo(demoPath string, startTick int32) error {
+	cutterPath := path.Join(homeDir, ".local", "share", "cut_demo")
+	command := exec.Command(cutterPath, demoPath, string(startTick))
+	err := command.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}

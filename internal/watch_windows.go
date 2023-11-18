@@ -139,3 +139,12 @@ func ParseDemo(demoPath string) string {
 	}
 	return out.String()
 }
+
+func CutDemo(demoPath string, startTick int32) error {
+	command := exec.Command(`bin\cut_demo.exe`, demoPath, string(startTick))
+	err := command.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -3,7 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"log"
-	"os/exec"
 )
 
 // Process demo and write the result to _events.txt
@@ -23,15 +22,6 @@ func ProcessDemo(demoPath string) error {
 	err = demo.Player.processKills()
 	if err != nil {
 		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-func CutDemo(demoPath string, startTick int32) error {
-	command := exec.Command(`bin\cut_demo.exe`, demoPath, string(startTick))
-	err := command.Run()
-	if err != nil {
 		return err
 	}
 	return nil
