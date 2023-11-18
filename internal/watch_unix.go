@@ -134,10 +134,16 @@ func ParseDemo(demoPath string) string {
 }
 
 func CutDemo(demoPath string, startTick int32) error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	cutterPath := path.Join(homeDir, ".local", "share", "cut_demo")
 	command := exec.Command(cutterPath, demoPath, string(startTick))
-	err := command.Run()
+	err = command.Run()
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	return nil
