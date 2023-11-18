@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-cd rust/
+cd ../rust/
 cargo build --release
 cargo build --release --target=x86_64-pc-windows-gnu
 cp target/release/librust.so ../lib/rust.so
