@@ -48,7 +48,10 @@ func WatchDemosDir() {
 						break
 					}
 					log.Println("Processing demo:", TrimDemoName(event.Name))
-					ProcessDemo(event.Name)
+					err := ProcessDemo(event.Name)
+					if err != nil {
+						log.Println(err)
+					}
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
@@ -125,7 +128,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 // Parses demo and returns a JSON string to unmarshal
 func ParseDemo(demoPath string) string {
 
-	command := exec.Command(".\\parse_demo.exe", demoPath)
+	command := exec.Command(`.\bin\parse_demo.exe`, demoPath)
 
 	var out bytes.Buffer
 

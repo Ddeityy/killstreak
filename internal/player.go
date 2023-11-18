@@ -2,6 +2,7 @@ package internal
 
 import (
 	"errors"
+	"fmt"
 	"log"
 )
 
@@ -42,7 +43,7 @@ func (p *Player) GetPlayerKills() error {
 		}
 	}
 	if len(p.Kills) <= 3 {
-		return errors.New("less than 3 kills found, aborting")
+		return fmt.Errorf("Less than 3 kills found, aborting")
 	}
 	p.MainClass = p.Demo.getPlayerClass()
 	p.Kills = userKills
@@ -50,17 +51,21 @@ func (p *Player) GetPlayerKills() error {
 	return nil
 }
 
-func (p *Player) processKills() {
+func (p *Player) processKills() error {
 	p.GetUserId()
 	err := p.GetPlayerKills()
 	if err != nil {
-		log.Println("Formatting.")
-		p.WriteKillstreaksToEvents()
-		return
+		log.Println(err)
+		return err
 	}
-	p.GetUserKillstreaks()
+	err = p.GetUserKillstreaks()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	log.Println("Formatting and writing killstreaks")
 	p.WriteKillstreaksToEvents()
+	return nil
 }
 
 func (p *Player) GetUserId() {
@@ -72,7 +77,7 @@ func (p *Player) GetUserId() {
 }
 
 // Finds all killstreaks
-func (p *Player) GetUserKillstreaks() {
+func (p *Player) GetUserKillstreaks() error {
 
 	lastKill := p.Kills[0]
 
@@ -93,6 +98,10 @@ func (p *Player) GetUserKillstreaks() {
 		}
 		lastKill = currentKill
 	}
+	if len(p.Killstreaks) == 0 {
+		return errors.New("No killstreaks found")
+	}
+	return nil
 }
 
 // Removes duplicate killstreaks and keeps the separator

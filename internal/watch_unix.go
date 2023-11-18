@@ -48,7 +48,10 @@ func WatchDemosDir() {
 					break
 				}
 				log.Println("Processing demo:", TrimDemoName(event.Name))
-				ProcessDemo(event.Name)
+				err := ProcessDemo(event.Name)
+				if err != nil {
+					log.Println(err)
+				}
 			}
 		case err := <-watcher.Error:
 			log.Println("Error:", err)
