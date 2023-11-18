@@ -3,7 +3,6 @@ echo "Killing old service"
 systemctl --user -M $SUDO_USER@ stop killstreak.service
 echo "Copying the executables"
 cp bin/killstreak /home/$SUDO_USER/.local/share/
-cp bin/parse_demo /home/$SUDO_USER/.local/share/
 echo "Creating service file"
 sudo touch /etc/systemd/user/killstreak.service
 sudo bash -c 'cat' << EOF > /etc/systemd/user/killstreak.service
