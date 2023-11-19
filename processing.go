@@ -14,14 +14,14 @@ func ProcessDemo(demoPath string) error {
 		return err
 	}
 
-	p := Player{Username: demo.Header.Nick, MapName: demo.Header.Map, Demo: &demo}
+	p := Player{Username: demo.Header.Nick, Demo: &demo}
 
 	demo.Player = p
 
-	log.Println("Processing kills")
+	log.Println("Processing kills.")
 	err = demo.Player.processKills()
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 		return err
 	}
 	return nil

@@ -9,10 +9,8 @@ import (
 // Main player struct to retrieve killstreaks
 type Player struct {
 	Demo        *Demo
-	DemoName    string
 	Username    string
 	UserId      int
-	MapName     string
 	Kills       []Kill
 	Killstreaks []Killstreak
 	MainClass   string // Most spawned as class
@@ -43,11 +41,11 @@ func (p *Player) GetPlayerKills() error {
 		}
 	}
 	if len(p.Kills) <= 3 {
-		return fmt.Errorf("Less than 3 kills found, aborting")
+		return fmt.Errorf("less than 3 kills found, aborting")
 	}
 	p.MainClass = p.Demo.getPlayerClass()
 	p.Kills = userKills
-	p.DemoName = TrimDemoName(p.Demo.Path)
+	p.Demo.Name = TrimDemoName(p.Demo.Path)
 	return nil
 }
 
@@ -55,15 +53,15 @@ func (p *Player) processKills() error {
 	p.GetUserId()
 	err := p.GetPlayerKills()
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 		return err
 	}
 	err = p.GetUserKillstreaks()
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 		return err
 	}
-	log.Println("Formatting and writing killstreaks")
+	log.Println("Formatting and writing killstreaks.")
 	p.WriteKillstreaksToEvents()
 	return nil
 }
@@ -99,7 +97,7 @@ func (p *Player) GetUserKillstreaks() error {
 		lastKill = currentKill
 	}
 	if len(p.Killstreaks) == 0 {
-		return errors.New("No killstreaks found")
+		return errors.New("no killstreaks found")
 	}
 	return nil
 }

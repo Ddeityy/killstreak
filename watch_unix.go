@@ -48,7 +48,7 @@ func WatchDemosDir() {
 				log.Println("Processing demo:", TrimDemoName(event.Name))
 				err := ProcessDemo(event.Name)
 				if err != nil {
-					log.Println(err)
+					log.Println("Error:", err)
 				}
 			}
 		case err := <-watcher.Error:
@@ -82,15 +82,15 @@ func (p *Player) WriteKillstreaksToEvents() {
 
 	for i, line := range lines {
 		if strings.Contains(line, "Killstreak") {
-			if strings.Contains(line, p.DemoName) {
+			if strings.Contains(line, p.Demo.Name) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					lines[i-1] = fmt.Sprintf(">\n%v %v %v", prefix, p.MapName, p.MainClass)
+					lines[i-1] = fmt.Sprintf(">\n%v %v %v", prefix, p.Demo.Name, p.MainClass)
 					lines[i] = fmt.Sprintf(
 						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
 						prefix,
 						len(k.Kills),
-						p.DemoName,
+						p.Demo.Name,
 						k.StartTick,
 						k.EndTick,
 						k.Length,
@@ -105,7 +105,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 
 	err = os.WriteFile(eventsFile, []byte(output), 0644)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
 }

@@ -2,6 +2,7 @@ package main
 
 // Main struct of the entire demo file
 type Demo struct {
+	Name   string
 	Path   string
 	Header Header `json:"header"`
 	State  State  `json:"state"`
@@ -9,33 +10,14 @@ type Demo struct {
 }
 
 type Header struct {
-	DemoType string  `json:"demo_type"`
-	Version  int     `json:"version"`
-	Protocol int     `json:"protocol"`
-	Server   string  `json:"server"`
-	Nick     string  `json:"nick"`
-	Map      string  `json:"map"`
-	Game     string  `json:"game"`
-	Duration float64 `json:"duration"`
-	Ticks    int     `json:"ticks"`
-	Frames   int     `json:"frames"`
-	Signon   int     `json:"signon"`
+	Nick string `json:"nick"`
+	Map  string `json:"map"`
 }
 
 type State struct {
-	Chat      []Chat        `json:"chat"`
 	Users     map[int]Users `json:"users"`
 	Deaths    []Deaths      `json:"deaths"`
-	Rounds    []Rounds      `json:"rounds"`
 	StartTick float64       `json:"startTick"`
-}
-
-// Chat entries
-type Chat struct {
-	Kind string  `json:"kind"`
-	From string  `json:"from"`
-	Text string  `json:"text"`
-	Tick float64 `json:"tick"`
 }
 
 // All players in the demo
@@ -54,13 +36,6 @@ type Deaths struct {
 	Assister int     `json:"assister"`
 	Killer   int     `json:"killer"`
 	Tick     float64 `json:"tick"`
-}
-
-// All rounds and who won
-type Rounds struct {
-	Winner  string  `json:"winner"`
-	Length  float64 `json:"length"`
-	EndTick int     `json:"end_tick"`
 }
 
 // Class enums given by demo parser

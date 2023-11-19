@@ -50,7 +50,7 @@ func WatchDemosDir() {
 					log.Println("Processing demo:", TrimDemoName(event.Name))
 					err := ProcessDemo(event.Name)
 					if err != nil {
-						log.Println(err)
+						log.Println("Error:", err)
 					}
 				}
 			case err, ok := <-watcher.Errors:
@@ -120,7 +120,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 
 	err = os.WriteFile(eventsFile, []byte(output), 0644)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
 }
@@ -134,7 +134,7 @@ func ParseDemo(demoPath string) string {
 	command.Stdout = &out
 	err := command.Run()
 	if err != nil {
-		log.Println(err)
+		log.Println("Error:", err)
 	}
 	return out.String()
 }
