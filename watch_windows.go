@@ -4,9 +4,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 
@@ -126,4 +128,26 @@ func (p *Player) WriteKillstreaksToEvents() {
 		log.Println("Error:", err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
+}
+
+func ParseDemo(demoPath string) string {
+	command := exec.Command(".\\parse_demo.exe", demoPath)
+
+	var out bytes.Buffer
+
+	command.Stdout = &out
+	err := command.Run()
+	if err != nil {
+		log.Println(err)
+	}
+	return out.String()
+}
+
+func CutDemo(demoPath string, startTick int32) {
+	command := exec.Command(".\cut_demo.exe", demoPath, string(startTick))
+
+	err := command.Run()
+	if err != nil {
+		log.Println(err)
+	}
 }
