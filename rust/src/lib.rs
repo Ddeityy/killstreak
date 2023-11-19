@@ -23,12 +23,19 @@ struct JsonDemo {
 pub extern "C" fn parse_demo(demo_path: *const libc::c_char) -> *const libc::c_char {
     let file_path = unsafe { CStr::from_ptr(demo_path) };
     let file_path_str = file_path.to_str().unwrap();
-    let file = fs::read(PathBuf::from(file_path_str)).unwrap();
+    let not_found_error: Vec<u8> = String::from("File not found").into();
+    let file = fs::read(PathBuf::from(file_path_str)).unwrap_or(not_found_error.clone());
+    if file == not_found_error {
+        return CString::new(file).unwrap().into_raw();
+    }
     let demo = Demo::new(&file);
 
-    // Use the default (simple) analyzer to track kills, assists, and deaths
     let parser = DemoParser::new(demo.get_stream());
-    let (header, state) = parser.parse().unwrap();
+    let incomplete_demo_error: Vec<u8> = String::from("Incomplete demo").into();
+    let (header, state) = match parser.parse() {
+        Ok((header, state)) => (header, state),
+        Err(_) => return CString::new(incomplete_demo_error).unwrap().into_raw(),
+    };
     let demo = JsonDemo { header, state };
     let result = serde_json::to_string(&demo).unwrap().as_bytes().to_owned();
     CString::new(result).unwrap().into_raw()
