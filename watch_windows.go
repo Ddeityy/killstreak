@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -42,7 +43,7 @@ func WatchDemosDir() {
 					}
 
 					// Check if demo was auto-deleted
-					demo := RustParseDemo(event.Name)
+					demo := ParseDemo(event.Name)
 					if demo == "File not found" {
 						log.Println(demo)
 						break
@@ -144,10 +145,32 @@ func ParseDemo(demoPath string) string {
 }
 
 func CutDemo(demoPath string, startTick int32) {
-	command := exec.Command(".\cut_demo.exe", demoPath, string(startTick))
+	command := exec.Command(".\\cut_demo.exe", demoPath, string(startTick))
 
 	err := command.Run()
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+// Process demo and write the result to _events.txt
+func ProcessDemo(demoPath string) error {
+	data := ParseDemo(demoPath)
+	demo := Demo{Path: demoPath}
+	err := json.Unmarshal([]byte(data), &demo)
+	if err != nil {
+		return err
+	}
+
+	p := Player{Username: demo.Header.Nick, Demo: &demo}
+
+	demo.Player = p
+
+	log.Println("Processing kills.")
+	err = demo.Player.processKills()
+	if err != nil {
+		log.Println("Error:", err)
+		return nil
+	}
+	return nil
 }
