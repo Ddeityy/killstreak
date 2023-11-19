@@ -22,7 +22,7 @@ func ProcessDemo(demoPath string) error {
 	err = demo.Player.processKills()
 	if err != nil {
 		log.Println("Error:", err)
-		return err
+		return nil
 	}
 	return nil
 }

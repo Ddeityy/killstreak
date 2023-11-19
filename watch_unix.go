@@ -66,7 +66,6 @@ func getDemosDir() string {
 	return demosDir
 }
 
-// TODO add "playdemo $demopath; demo_gototick $tick 0 (offset) 1 (pause)"
 // Replaces default killstreak logs with custom ones in _event.txt
 func (p *Player) WriteKillstreaksToEvents() {
 	demosDir := getDemosDir()
@@ -85,8 +84,9 @@ func (p *Player) WriteKillstreaksToEvents() {
 			if strings.Contains(line, p.Demo.Name) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					lines[i-1] = fmt.Sprintf(">\n%v %v %v", prefix, p.Demo.Name, p.MainClass)
-					lines[i] = fmt.Sprintf(
+					ticks := fmt.Sprintf("playdemo demos/%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					header := fmt.Sprintf("%v %v %v", prefix, p.Demo.Header.Map, p.MainClass)
+					streak := fmt.Sprintf(
 						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
 						prefix,
 						len(k.Kills),
@@ -95,6 +95,9 @@ func (p *Player) WriteKillstreaksToEvents() {
 						k.EndTick,
 						k.Length,
 					)
+					var l []string
+					l = append(l, ticks, header, streak)
+					lines[i] = strings.Join(l, "\n")
 				}
 			}
 		}
