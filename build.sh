@@ -3,6 +3,7 @@
 cd rust/
 echo "building .so for linux"
 cargo build --release
+cargo build --release --target=x86_64-pc-windows-gnu
 echo "copying dynamic libraries"
 cp target/release/librust.so ../lib/rust.so
 cd ..
