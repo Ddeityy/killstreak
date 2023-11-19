@@ -99,10 +99,10 @@ func (p *Player) WriteKillstreaksToEvents() {
 			if strings.Contains(line, p.Demo.Name) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					ticks := fmt.Sprintf(">\nplaydemo %v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					ticks := fmt.Sprintf("playdemo demos/%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
 					header := fmt.Sprintf("%v %v %v", prefix, p.Demo.Header.Map, p.MainClass)
 					streak := fmt.Sprintf(
-						`%s Kill Streak: %v ("%v" %v-%v [%.2f seconds])`,
+						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
 						prefix,
 						len(k.Kills),
 						p.Demo.Name,

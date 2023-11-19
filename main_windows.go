@@ -10,6 +10,7 @@ package main
 */
 import "C"
 import (
+	"log"
 	"unsafe"
 )
 
@@ -33,5 +34,6 @@ func RustCutDemo(demoPath string, startTick string) {
 }
 
 func main() {
+	log.Println("Hello kitty")
 	WatchDemosDir()
 }
