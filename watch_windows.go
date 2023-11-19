@@ -4,14 +4,11 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/ddeityy/steamlocate-go"
 	"github.com/fsnotify/fsnotify"
@@ -21,7 +18,7 @@ import (
 //  1. Timer based WRITE check - bad
 //  2. Try to read/write/copy a demo being written - lock?
 func WatchDemosDir() {
-	//demosDir := getDemosDir()
+	demosDir := getDemosDir()
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -41,12 +38,18 @@ func WatchDemosDir() {
 					if event.Name[len(event.Name)-4:] != ".dem" {
 						break
 					}
-					// Check if demo was auto-deleted by prec_delete_useless_demo
-					time.Sleep(time.Millisecond * 100)
-					if _, err := os.Stat(event.Name); os.IsNotExist(err) {
-						log.Println("Demo deleted:", err)
+
+					// Check if demo was auto-deleted
+					demo := RustParseDemo(event.Name)
+					if demo == "File not found" {
+						log.Println(demo)
 						break
 					}
+
+					if strings.Contains(demo, `"duration":0.0`) {
+						break
+					}
+
 					log.Println("Processing demo:", TrimDemoName(event.Name))
 					err := ProcessDemo(event.Name)
 					if err != nil {
@@ -61,8 +64,7 @@ func WatchDemosDir() {
 			}
 		}
 	}()
-	err = watcher.Add(`test_data\windows`)
-	//	err = watcher.Add(demosDir)
+	err = watcher.Add(demosDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,13 +81,10 @@ func getDemosDir() string {
 	return demosDir
 }
 
-// TODO add "playdemo $demopath; demo_gototick $tick 0 (offset) 1 (pause)"
-// Replaces default killstreak logs with custom ones in _event.txt
+// Replaces default killstreak logs with custom ones in killstreaks.txt
 func (p *Player) WriteKillstreaksToEvents() {
-	//demosDir := getDemosDir()
-	//eventsFile := path.Join(demosDir, "KillStreaks.txt")
-
-	eventsFile := path.Join("test_data", "windows", "KillStreaks.txt")
+	demosDir := getDemosDir()
+	eventsFile := path.Join(demosDir, "KillStreaks.txt")
 
 	file, err := os.ReadFile(eventsFile)
 	if err != nil {
@@ -97,19 +96,23 @@ func (p *Player) WriteKillstreaksToEvents() {
 
 	for i, line := range lines {
 		if strings.Contains(line, "Kill Streak") {
-			if strings.Contains(line, p.DemoName) {
+			if strings.Contains(line, p.Demo.Name) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					lines[i-1] = fmt.Sprintf(">\n%v %v %v", prefix, p.MapName, p.MainClass)
-					lines[i] = fmt.Sprintf(
+					ticks := fmt.Sprintf(">\nplaydemo %v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					header := fmt.Sprintf("%v %v %v", prefix, p.Demo.Header.Map, p.MainClass)
+					streak := fmt.Sprintf(
 						`%s Kill Streak: %v ("%v" %v-%v [%.2f seconds])`,
 						prefix,
 						len(k.Kills),
-						p.DemoName,
+						p.Demo.Name,
 						k.StartTick,
 						k.EndTick,
 						k.Length,
 					)
+					var l []string
+					l = append(l, ticks, header, streak)
+					lines[i] = strings.Join(l, "\n")
 				}
 			}
 		}
@@ -123,27 +126,4 @@ func (p *Player) WriteKillstreaksToEvents() {
 		log.Println("Error:", err)
 	}
 	log.Printf("Finished: %+v", p.Killstreaks)
-}
-
-func ParseDemo(demoPath string) string {
-
-	command := exec.Command(`.\bin\parse_demo.exe`, demoPath)
-
-	var out bytes.Buffer
-
-	command.Stdout = &out
-	err := command.Run()
-	if err != nil {
-		log.Println("Error:", err)
-	}
-	return out.String()
-}
-
-func CutDemo(demoPath string, startTick int32) error {
-	command := exec.Command(`bin\cut_demo.exe`, demoPath, string(startTick))
-	err := command.Run()
-	if err != nil {
-		return err
-	}
-	return nil
 }

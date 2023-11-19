@@ -10,8 +10,6 @@ package main
 */
 import "C"
 import (
-	"fmt"
-	"log"
 	"unsafe"
 )
 
@@ -35,6 +33,5 @@ func RustCutDemo(demoPath string, startTick string) {
 }
 
 func main() {
-	log.Println(RustParseDemo("/home/deity/Dev/killstreak/test_data/unix/2023-11-11_22-30-00.dem"))
-	RustCutDemo("/home/deity/Dev/killstreak/test_data/unix/2023-11-11_22-30-00.dem", fmt.Sprint(30756))
+	WatchDemosDir()
 }
