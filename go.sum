@@ -11,6 +11,8 @@ github.com/ddeityy/steamlocate-go v0.0.0-20231119154236-327b70aaae34 h1:fbuxJZwe
 github.com/ddeityy/steamlocate-go v0.0.0-20231119154236-327b70aaae34/go.mod h1:Mm5+PdKlc2y/2x1p9V72nh8tN7FZFQdMibs90OQfyeA=
 github.com/ddeityy/steamlocate-go v0.0.0-20231119155800-cb14d9443361 h1:jOnD3xQBkdBMreyyhB7pUHdZD1jMWcb4hJwTEIleFM0=
 github.com/ddeityy/steamlocate-go v0.0.0-20231119155800-cb14d9443361/go.mod h1:Mm5+PdKlc2y/2x1p9V72nh8tN7FZFQdMibs90OQfyeA=
+github.com/ddeityy/steamlocate-go v0.0.0-20231119160409-77bda4914f8c h1:1gaEi7VVx58R+/bkEHIj6yqa4G26uhwF4luFjO92VVA=
+github.com/ddeityy/steamlocate-go v0.0.0-20231119160409-77bda4914f8c/go.mod h1:Mm5+PdKlc2y/2x1p9V72nh8tN7FZFQdMibs90OQfyeA=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/knadh/koanf/maps v0.1.1 h1:G5TjmUh2D7G2YWf5SQQqSiHRJEjaicvU0KpypqB3NIs=
