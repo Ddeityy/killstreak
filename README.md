@@ -1,8 +1,8 @@
-# Better killstreaks for TF2 for Linux
+# Better killstreaks for TF2
 
-## Provides a more informative format for killstreaks when using TF2's default demo recorder.
+## Provides a more informative format for killstreaks.
 
-### TF2 demo [parser](https://github.com/demostf/parser) by [@icewind1991](https://github.com/icewind1991/).
+### TF2 demo [parser](https://github.com/demostf/parser) and [cutter](https://github.com/demostf/edit) by [@icewind1991](https://github.com/icewind1991/).
 
 ### Old
 ```
@@ -17,7 +17,6 @@
 [2023/11/08 23:48] Bookmark ("2023-11-08_23-32-45" at 20000)
 [2023/11/08 23:48] Killstreak 6 ("2023-11-08_23-32-45" 60781-62998 [18.25 seconds])
 ```
-#### **For now this only works with the default demo folder location: tf/demos**
 ### Installation
 Download the release and run
 ```console
