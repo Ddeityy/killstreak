@@ -9,8 +9,8 @@ fn main() {
     let mut demo_in: PathBuf = args[1].clone().into();
     let tick_from: u32;
     let tick_to: u32;
-    if args.len() == 1 {
-        let d = demo_in.file_name().unwrap().to_str().unwrap().split("_");
+    if args.len() == 2 {
+        let d = demo_in.file_stem().unwrap().to_str().unwrap().split("_");
         let c: Vec<_> = d.collect();
         tick_from = c[1].parse().unwrap();
         tick_to = tick_from.clone()
