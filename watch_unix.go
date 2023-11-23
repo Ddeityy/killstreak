@@ -88,7 +88,7 @@ func (p *Player) WriteKillstreaksToEvents() {
 					var ticks string
 					if cut {
 						RustCutDemo(p.Demo.Path, fmt.Sprintf("%v", k.StartTick))
-						ticks = fmt.Sprintf("playdemo demos/cut_%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+						ticks = fmt.Sprintf("playdemo demos/cut_%v", p.Demo.Name)
 					} else {
 						ticks = fmt.Sprintf("playdemo demos/%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
 					}
