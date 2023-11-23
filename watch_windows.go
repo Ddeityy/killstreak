@@ -79,7 +79,7 @@ func WatchDemosDir() {
 func getDemosDir() string {
 	steamDir := steamlocate.SteamDir{}
 	steamDir.Locate()
-	steamdir.SteamApps.Discover()
+	steamDir.SteamApps.Discover()
 	demosDir := steamDir.SteamApps.Apps[440].Path
 	demosDir = path.Join(demosDir, "tf")
 	return demosDir

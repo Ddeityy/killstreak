@@ -60,10 +60,10 @@ func WatchDemosDir() {
 
 // Returns the absolute path of /demos
 func getDemosDir() string {
-	steamdir := steamlocate.SteamDir{}
-	steamdir.Locate()
-	steamdir.SteamApps.Discover()
-	demosDir := steamdir.SteamApps.Apps[440].Path
+	steamDir := steamlocate.SteamDir{}
+	steamDir.Locate()
+	steamDir.SteamApps.Discover()
+	demosDir := steamDir.SteamApps.Apps[440].Path
 	demosDir = path.Join(demosDir, "tf", "demos")
 	return demosDir
 }
