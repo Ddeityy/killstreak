@@ -5,7 +5,7 @@ go 1.21.1
 toolchain go1.21.3
 
 require (
-	github.com/ddeityy/steamlocate-go v0.0.0-20231119160409-77bda4914f8c
+	github.com/ddeityy/steamlocate-go v0.0.0-20231123221950-afcad1dcc7ef
 	github.com/fsnotify/fsnotify v1.7.0
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 )
