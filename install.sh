@@ -6,8 +6,8 @@ echo "Copying the executables"
 cp bin/killstreak /home/$SUDO_USER/.local/share/
 read -p "Do you want automatic demo cutting (y/n)?" choice
 case "$choice" in 
-  y|Y ) $cut=true;;
-  n|N ) $cut=false;;
+  y|Y ) cut=true;;
+  n|N ) ;;
   * ) echo "defaulting to no";;
 esac
 echo "Creating service file"
