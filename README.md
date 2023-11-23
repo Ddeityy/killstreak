@@ -13,13 +13,27 @@
 
 ### New
 ```
-playdemo 2023-11-08_23-32-45; demo_gototick 60781 0 1
+cut=true
+playdemo demos/cut_2023-11-08_23-32-45; demo_gototick 60781 0 1
+cut=false
+playdemo demos/2023-11-08_23-32-45; demo_gototick 60781 0 1
+
 [2023/11/08 23:48] cp_entropy_b5 scout
 [2023/11/08 23:48] Bookmark ("2023-11-08_23-32-45" at 20000)
 [2023/11/08 23:48] Killstreak 6 ("2023-11-08_23-32-45" 60781-62998 [18.25 seconds])
 ```
-### Installation
-Download the release and run
+### Install
+#### Linux:
+* Download the linux release and run
 ```console
 $ sudo ./install.sh
 ```
+
+#### Windows
+* Download the windows release
+* Download [nssm](http://nssm.cc/download)
+* Run
+```console
+nssm.exe install killstreak
+```
+Select the main killstreak.exe path and pass cut=true in the arguements for automatic demo cutting
