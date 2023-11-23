@@ -10,6 +10,7 @@ package main
 */
 import "C"
 import (
+	"flag"
 	"unsafe"
 )
 
@@ -32,6 +33,11 @@ func RustCutDemo(demoPath string, startTick string) {
 	C.cut_demo(cDemoPath, cStartTick)
 }
 
+var cut bool
+
 func main() {
+	autoCut := flag.Bool("cut", true, "Automatically cut the demo")
+	flag.Parse()
+	cut = *autoCut
 	WatchDemosDir()
 }

@@ -102,7 +102,13 @@ func (p *Player) WriteKillstreaksToEvents() {
 			if strings.Contains(line, p.Demo.Name) {
 				prefix := line[:18]
 				for _, k := range p.Killstreaks {
-					ticks := fmt.Sprintf("playdemo demos/%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					var ticks string
+					if cut {
+						CutDemo(p.Demo.Path, k.StartTick)
+						ticks = fmt.Sprintf("playdemo demos/cut_%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					} else {
+						ticks = fmt.Sprintf("playdemo demos/%v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
+					}
 					header := fmt.Sprintf("%v %v %v", prefix, p.Demo.Header.Map, p.MainClass)
 					streak := fmt.Sprintf(
 						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
@@ -144,7 +150,7 @@ func ParseDemo(demoPath string) string {
 	return out.String()
 }
 
-func CutDemo(demoPath string, startTick int32) {
+func CutDemo(demoPath string, startTick int) {
 	command := exec.Command(".\\cut_demo.exe", demoPath, string(startTick))
 
 	err := command.Run()

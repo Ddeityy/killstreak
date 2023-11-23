@@ -18,13 +18,13 @@ type Player struct {
 
 type Killstreak struct {
 	Kills     []Kill
-	StartTick float64
-	EndTick   float64
+	StartTick int
+	EndTick   int
 	Length    float64 // Seconds
 }
 
 type Kill struct {
-	Tick float64
+	Tick int
 }
 
 const killInterval = 15.0 // P-REC default = 15.0
@@ -36,7 +36,7 @@ func (p *Player) GetPlayerKills() error {
 	for _, v := range p.Demo.State.Deaths {
 		if v.Killer != v.Victim {
 			if v.Killer == p.UserId {
-				userKills = append(userKills, Kill{Tick: v.Tick - p.Demo.State.StartTick})
+				userKills = append(userKills, Kill{Tick: int(v.Tick - p.Demo.State.StartTick)})
 			}
 		}
 	}
@@ -82,14 +82,14 @@ func (p *Player) GetUserKillstreaks() error {
 	killstreak := Killstreak{StartTick: lastKill.Tick}
 
 	for _, currentKill := range p.Kills[1:] {
-		timeBetweenKills := (currentKill.Tick - lastKill.Tick) * tick
+		timeBetweenKills := (float64(currentKill.Tick) - float64(lastKill.Tick)) * tick
 		killstreak.Kills = append(killstreak.Kills, lastKill)
 
 		if timeBetweenKills <= killInterval {
 			killstreak.EndTick = currentKill.Tick
 		} else {
 			if len(killstreak.Kills) >= 4 {
-				killstreak.Length = (killstreak.EndTick - killstreak.StartTick) * tick
+				killstreak.Length = (float64(killstreak.EndTick) - float64(killstreak.StartTick)) * tick
 				p.Killstreaks = append(p.Killstreaks, killstreak)
 			}
 			killstreak = Killstreak{StartTick: currentKill.Tick}
