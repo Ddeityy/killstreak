@@ -12,7 +12,9 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 
+	"github.com/bep/debounce"
 	"github.com/ddeityy/steamlocate-go"
 	"github.com/fsnotify/fsnotify"
 )
@@ -27,6 +29,8 @@ func WatchDemosDir() {
 		log.Fatal(err)
 	}
 	defer watcher.Close()
+
+	dParseDemo := debounce.New(300 * time.Millisecond)
 
 	// Start listening for events.
 	go func() {
@@ -43,7 +47,7 @@ func WatchDemosDir() {
 					}
 
 					// Check if demo was auto-deleted
-					demo := ParseDemo(event.Name)
+					demo := dParseDemo(ParseDemo(event.Name))
 					if demo == "File not found" {
 						log.Println(demo)
 						break

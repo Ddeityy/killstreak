@@ -12,6 +12,7 @@ require (
 
 require (
 	github.com/andygrunwald/vdf v1.1.0 // indirect
+	github.com/bep/debounce v1.2.1 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/knadh/koanf/providers/file v0.1.0 // indirect
 	github.com/knadh/koanf/v2 v2.0.1 // indirect
