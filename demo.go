@@ -10,8 +10,9 @@ type Demo struct {
 }
 
 type Header struct {
-	Nick string `json:"nick"`
-	Map  string `json:"map"`
+	Nick     string  `json:"nick"`
+	Map      string  `json:"map"`
+	Duration float32 `json:"duration"`
 }
 
 type State struct {

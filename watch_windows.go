@@ -30,7 +30,8 @@ func WatchDemosDir() {
 	}
 	defer watcher.Close()
 
-	dParseDemo := debounce.New(300 * time.Millisecond)
+	// refactor to use something like demo.Parse(path) to use the debouncer?
+	dbounce := debounce.New(1000 * time.Millisecond)
 
 	// Start listening for events.
 	go func() {
@@ -47,18 +48,15 @@ func WatchDemosDir() {
 					}
 
 					// Check if demo was auto-deleted
-					demo := dParseDemo(ParseDemo(event.Name))
-					if demo == "File not found" {
-						log.Println(demo)
-						break
-					}
+					demo := Demo{Path: event.Name}
+					dbounce(demo.ParseDemo)
 
-					if strings.Contains(demo, `"duration":0.0`) {
+					if demo.Header.Duration == 0.0 {
 						break
 					}
 
 					log.Println("Processing demo:", TrimDemoName(event.Name))
-					err := ProcessDemo(event.Name)
+					err := demo.ProcessDemo()
 					if err != nil {
 						log.Println("Error:", err)
 					}
@@ -142,8 +140,8 @@ func (p *Player) WriteKillstreaksToEvents() {
 	log.Printf("Finished: %+v", p.Killstreaks)
 }
 
-func ParseDemo(demoPath string) string {
-	command := exec.Command(".\\parse_demo.exe", demoPath)
+func (d *Demo) ParseDemo() {
+	command := exec.Command(".\\parse_demo.exe", d.Path)
 
 	var out bytes.Buffer
 
@@ -152,7 +150,10 @@ func ParseDemo(demoPath string) string {
 	if err != nil {
 		log.Println(err)
 	}
-	return out.String()
+	err = json.Unmarshal([]byte(out.String()), &d)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func CutDemo(demoPath string, startTick int) {
@@ -165,20 +166,13 @@ func CutDemo(demoPath string, startTick int) {
 }
 
 // Process demo and write the result to _events.txt
-func ProcessDemo(demoPath string) error {
-	data := ParseDemo(demoPath)
-	demo := Demo{Path: demoPath}
-	err := json.Unmarshal([]byte(data), &demo)
-	if err != nil {
-		return err
-	}
+func (d *Demo) ProcessDemo() error {
+	p := Player{Username: d.Header.Nick, Demo: d}
 
-	p := Player{Username: demo.Header.Nick, Demo: &demo}
-
-	demo.Player = p
+	d.Player = p
 
 	log.Println("Processing kills.")
-	err = demo.Player.processKills()
+	err := d.Player.processKills()
 	if err != nil {
 		log.Println("Error:", err)
 		return nil
