@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/bep/debounce v1.2.1
-	github.com/ddeityy/steamlocate-go v0.0.0-20231123222550-18bb80473400
+	github.com/ddeityy/steamlocate-go v0.0.0-20231130215144-936b304ac3a1
 	github.com/fsnotify/fsnotify v1.7.0
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661
 )

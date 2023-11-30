@@ -19,9 +19,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-// On WRITE event wait a bit and:
-//  1. Timer based WRITE check - bad
-//  2. Try to read/write/copy a demo being written - lock?
 func WatchDemosDir() {
 	demosDir := getDemosDir()
 	watcher, err := fsnotify.NewWatcher()
@@ -81,7 +78,6 @@ func WatchDemosDir() {
 func getDemosDir() string {
 	steamDir := steamlocate.SteamDir{}
 	steamDir.Locate()
-	steamDir.SteamApps.Discover()
 	demosDir := steamDir.SteamApps.Apps[440].Path
 	demosDir = path.Join(demosDir, "tf")
 	return demosDir
