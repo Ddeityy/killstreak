@@ -10,7 +10,10 @@ package main
 */
 import "C"
 import (
-	"flag"
+	"log"
+	"os"
+	"path"
+	"strings"
 	"unsafe"
 )
 
@@ -22,22 +25,18 @@ func RustParseDemo(demoPath string) string {
 	return C.GoString(o)
 }
 
-// Cuts demo and outputs a cut_demoName.dem
-func RustCutDemo(demoPath string, startTick string) {
-	cDemoPath := C.CString(demoPath)
-	defer C.free(unsafe.Pointer(cDemoPath))
-
-	cStartTick := C.CString(startTick)
-	defer C.free(unsafe.Pointer(cStartTick))
-
-	C.cut_demo(cDemoPath, cStartTick)
+func main() {
+	WatchDemosDir()
 }
 
-var cut bool
-
-func main() {
-	autoCut := flag.Bool("cut", true, "Automatically cut the demo")
-	flag.Parse()
-	cut = *autoCut
-	WatchDemosDir()
+func formatDemos() {
+	demosDir := getDemosDir()
+	demos, _ := os.ReadDir(demosDir)
+	for _, demo := range demos {
+		if strings.Contains(demo.Name(), ".dem") {
+			log.Println("------------------------------------------------")
+			log.Println("Processing:", demo.Name())
+			ProcessDemo(path.Join(demosDir, demo.Name()))
+		}
+	}
 }

@@ -10,10 +10,6 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [[bin]]
-path = "src/cut_demo.rs"
-name = "cut_demo"
-
-[[bin]]
 path = "src/parse_demo.rs"
 name = "parse_demo"
 

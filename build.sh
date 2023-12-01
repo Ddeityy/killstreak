@@ -5,7 +5,6 @@ echo "building .so for linux"
 cargo build --release
 cargo build --release --target=x86_64-pc-windows-gnu
 echo "copying dynamic libraries and executables"
-cp target/x86_64-pc-windows-gnu/release/cut_demo.exe ../bin/
 cp target/x86_64-pc-windows-gnu/release/parse_demo.exe ../bin/
 cp target/release/librust.so ../lib/rust.so
 cd ..

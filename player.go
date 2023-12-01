@@ -27,7 +27,7 @@ type Kill struct {
 	Tick int
 }
 
-const killInterval = 15.0 // P-REC default = 15.0
+const killInterval = 16.0 // P-REC default = 15.0
 const tick = 0.015        // Amount of seconds per tick
 
 // Populates the kills, mainclass and demoname fields
@@ -58,7 +58,6 @@ func (p *Player) processKills() error {
 	}
 	err = p.GetUserKillstreaks()
 	if err != nil {
-		log.Println("Error:", err)
 		return err
 	}
 	log.Println("Formatting and writing killstreaks.")

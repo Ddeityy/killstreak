@@ -93,39 +93,42 @@ func (p *Player) WriteKillstreaksToEvents() {
 		log.Printf("%v", err)
 	}
 
-	log.Println("Reading _events.txt")
+	log.Println("Reading Killstreaks.txt")
 	lines := strings.Split(string(file), "\n")
 
 	for i, line := range lines {
-		if strings.Contains(line, "Kill Streak") {
-			if strings.Contains(line, p.Demo.Name) {
-				prefix := line[:18]
+		if strings.Contains(line, p.Demo.Name) {
+			prefix := line[:11]
+			header := fmt.Sprintf("%v] %v %v", prefix, p.Demo.Header.Map, p.MainClass)
+
+			if strings.Contains(line, "bookmark") {
+				lines[i] = fmt.Sprintf("%v\n%v\n", header, line)
+			}
+			if strings.Contains(line, "Kill streak") {
+				var streaks []string
 				for _, k := range p.Killstreaks {
-					var ticks string
-					if cut {
-						CutDemo(p.Demo.Path, k.StartTick)
-						ticks = fmt.Sprintf("playdemo cut_%v;", p.Demo.Name)
-					} else {
-						ticks = fmt.Sprintf("playdemo %v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
-					}
-					header := fmt.Sprintf("%v %v %v", prefix, p.Demo.Header.Map, p.MainClass)
+					ticks := fmt.Sprintf("playdemo %v; demo_gototick %v 0 1", p.Demo.Name, k.StartTick)
 					streak := fmt.Sprintf(
-						`%s Killstreak %v ("%v" %v-%v [%.2f seconds])`,
+						`%s Kill streak: %v ("%v" %v-%v [%.2f seconds])   -   %v`,
 						prefix,
 						len(k.Kills),
 						p.Demo.Name,
 						k.StartTick,
 						k.EndTick,
 						k.Length,
+						ticks,
 					)
-					var l []string
-					l = append(l, ticks, header, streak)
-					lines[i] = strings.Join(l, "\n")
+					streaks = append(streaks, streak)
 				}
+				var l []string
+				l = append(l, header)
+				l = append(l, streaks...)
+				lines[i] = strings.Join(l, "\n")
 			}
 		}
 	}
-	lines = removeDuplicateLines(lines, "\n")
+
+	lines = removeDuplicateLines(lines, ">")
 
 	output := strings.Join(lines, "\n")
 
