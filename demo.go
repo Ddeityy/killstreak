@@ -1,12 +1,23 @@
 package main
 
+import (
+	"encoding/json"
+	"path"
+	"runtime"
+	"strings"
+)
+
 // Main struct of the entire demo file
 type Demo struct {
-	Name   string
-	Path   string
-	Header Header `json:"header"`
-	State  State  `json:"state"`
-	Player Player
+	Name             string
+	Path             string
+	Header           Header `json:"header"`
+	State            State  `json:"state"`
+	Player           Player
+	Date             string
+	EventsFile       string
+	LegacyEventsFile string
+	DemoDir          string
 }
 
 type Header struct {
@@ -15,8 +26,16 @@ type Header struct {
 	Duration float32 `json:"duration"`
 }
 
+type Message struct {
+	Kind string `json:"kind"`
+	From string `json:"from"`
+	Text string `json:"text"`
+	Tick int    `json:"tick"`
+}
+
 type State struct {
 	Users     map[int]Users `json:"users"`
+	Chat      []Message     `json:"chat"`
 	Deaths    []Deaths      `json:"deaths"`
 	StartTick float64       `json:"startTick"`
 }
@@ -53,29 +72,28 @@ var classes = map[int]string{
 	9: "engineer",
 }
 
-// Returns player's userId in the demo
-func (d *Demo) GetUserId(steamId string) int {
-	for _, v := range d.State.Users {
-		if v.SteamId == d.Player.Username {
-			return v.UserId
-		}
-	}
-	return 0
-}
+func NewDemo(demoData string, demoPath string, demosDir string) (*Demo, error) {
+	demo := Demo{}
 
-// Returns player's most used class
-func (d *Demo) getPlayerClass() string {
-	maxNum := 0
-	var result int
-	for _, user := range d.State.Users {
-		if user.UserId == d.Player.UserId {
-			for k, v := range user.Classes {
-				if v > maxNum {
-					maxNum = v
-					result = k
-				}
-			}
-		}
+	err := json.Unmarshal([]byte(demoData), &demo)
+	if err != nil {
+		return nil, err
 	}
-	return classes[result]
+
+	p := NewPlayer(&demo)
+	demo.Player = p
+
+	demo.Path = demoPath
+	demo.Name = TrimDemoName(p.Demo.Path)
+	demo.Date = strings.Split(demo.Name, "_")[0]
+	demo.DemoDir = demosDir
+	demo.EventsFile = path.Join(demosDir, "events.txt")
+	switch runtime.GOOS {
+	case "linux":
+		demo.LegacyEventsFile = path.Join(demosDir, "_events.txt")
+	case "windows":
+		demo.LegacyEventsFile = path.Join(demosDir, "KillStreaks.txt")
+	}
+
+	return &demo, nil
 }

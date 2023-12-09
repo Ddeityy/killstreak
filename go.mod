@@ -5,14 +5,13 @@ go 1.21.1
 toolchain go1.21.3
 
 require (
-	github.com/bep/debounce v1.2.1
 	github.com/ddeityy/steamlocate-go v0.0.0-20231130215144-936b304ac3a1
-	github.com/fsnotify/fsnotify v1.7.0
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661
 )
 
 require (
 	github.com/andygrunwald/vdf v1.1.0 // indirect
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/knadh/koanf/providers/file v0.1.0 // indirect
 	github.com/knadh/koanf/v2 v2.0.1 // indirect
