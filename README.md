@@ -2,7 +2,7 @@
 
 ## Provides a more informative format for killstreaks.
 
-### TF2 demo [parser](https://github.com/demostf/parser) and [cutter](https://github.com/demostf/edit) by [@icewind1991](https://github.com/icewind1991/).
+### TF2 demo [parser](https://github.com/demostf/parser) by [@icewind1991](https://github.com/icewind1991/).
 
 ### Old
 ```
