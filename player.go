@@ -45,7 +45,7 @@ func (p *Player) GetPlayerKills() error {
 	for _, v := range p.Demo.State.Deaths {
 		if v.Killer != v.Victim {
 			if v.Killer == p.UserId {
-				userKills = append(userKills, Kill{Tick: int(v.Tick - p.Demo.State.StartTick)})
+				userKills = append(userKills, Kill{Tick: int(v.Tick)})
 			}
 		}
 	}
