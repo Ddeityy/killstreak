@@ -25,3 +25,7 @@ Cargo.lock
 
 # Go workspace file
 go.work
+
+bin/
+*.so
+*.tar.gz
