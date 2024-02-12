@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -22,22 +23,23 @@ func TrimDemoName(demoPath string) string {
 func GetDemosDir() (string, error) {
 	steamDir := steamlocate.SteamDir{}
 	steamDir.Locate()
+
 	tfDir := steamDir.SteamApps.Apps[440].Path
 	tfDir = path.Join(tfDir, "tf")
 	demosDir := path.Join(tfDir, "demos")
 
-	tf, err := checkDemos(tfDir)
+	tf, err := countDemos(tfDir)
 	if err != nil {
 		return "", err
 	}
 
-	demos, err := checkDemos(demosDir)
+	demos, err := countDemos(demosDir)
 	if err != nil {
 		return "", err
 	}
 
 	if tf == 0 && demos == 0 {
-		return "", fmt.Errorf("no demos found in either folder")
+		return "", errors.New("no demos found in either folder")
 	}
 
 	if tf > demos {
@@ -47,17 +49,20 @@ func GetDemosDir() (string, error) {
 	}
 }
 
-func checkDemos(dir string) (int, error) {
+func countDemos(dir string) (int, error) {
 	demos := 0
+
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return 0, err
 	}
+
 	for _, file := range files {
 		if strings.Contains(file.Name(), ".dem") {
 			demos++
 		}
 	}
+
 	return demos, nil
 }
 
@@ -73,9 +78,9 @@ func ProcessDemo(demoPath string, demosDir string) error {
 	log.Println("Processing kills.")
 	err = demo.Player.ProcessEvents()
 	if err != nil {
-		log.Println("Error:", err)
-		return nil
+		return fmt.Errorf("demo: %w", err)
 	}
+
 	return nil
 }
 
@@ -89,11 +94,10 @@ func WatchDemosDir() {
 
 	demosDir, err := GetDemosDir()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	err = watcher.Watch(demosDir)
-	if err != nil {
+	if err = watcher.Watch(demosDir); err != nil {
 		log.Fatal(err)
 	}
 
@@ -105,23 +109,23 @@ func WatchDemosDir() {
 				if event.Name[len(event.Name)-4:] != ".dem" {
 					break
 				}
-				log.Println("Finished writing:", event.Name)
+				log.Println("Finished writing", event.Name)
 
 				// Check if demo was auto-deleted by ds_stop
 				time.Sleep(time.Millisecond * 100)
 				if _, err := os.Stat(event.Name); os.IsNotExist(err) {
-					log.Println("Demo deleted:", err)
+					log.Println("demo deleted:", err)
 					break
 				}
 
-				log.Println("Processing demo:", TrimDemoName(event.Name))
-				err := ProcessDemo(event.Name, demosDir)
-				if err != nil {
-					log.Println("Error:", err)
+				log.Println("Processing demo", TrimDemoName(event.Name))
+				if err := ProcessDemo(event.Name, demosDir); err != nil {
+					log.Println("demo processing:", err)
 				}
+
 			}
 		case err := <-watcher.Error:
-			log.Println("Error:", err)
+			log.Println("watcher:", err)
 		}
 	}
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"path"
-	"runtime"
 	"strings"
 )
 
@@ -13,7 +12,7 @@ type Demo struct {
 	Path             string
 	Header           Header `json:"header"`
 	State            State  `json:"state"`
-	Player           Player
+	Player           *Player
 	Date             string
 	EventsFile       string
 	LegacyEventsFile string
@@ -75,25 +74,19 @@ var classes = map[int]string{
 func NewDemo(demoData string, demoPath string, demosDir string) (*Demo, error) {
 	demo := Demo{}
 
-	err := json.Unmarshal([]byte(demoData), &demo)
-	if err != nil {
+	if err := json.Unmarshal([]byte(demoData), &demo); err != nil {
 		return nil, err
 	}
 
 	p := NewPlayer(&demo)
-	demo.Player = p
 
+	demo.Player = p
 	demo.Path = demoPath
 	demo.Name = TrimDemoName(p.Demo.Path)
 	demo.Date = strings.Split(demo.Name, "_")[0]
 	demo.DemoDir = demosDir
 	demo.EventsFile = path.Join(demosDir, "events.txt")
-	switch runtime.GOOS {
-	case "linux":
-		demo.LegacyEventsFile = path.Join(demosDir, "_events.txt")
-	case "windows":
-		demo.LegacyEventsFile = path.Join(demosDir, "KillStreaks.txt")
-	}
+	demo.LegacyEventsFile = path.Join(demosDir, "_events.txt")
 
 	return &demo, nil
 }

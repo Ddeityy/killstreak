@@ -36,12 +36,22 @@ type Kill struct {
 	Tick int
 }
 
-const killInterval = 15.0 // P-REC default = 15.0
-const tick = 0.015        // Amount of seconds per tick
+const (
+	killInterval = 15.0  // P-REC default = 15.0
+	tick         = 0.015 // Amount of seconds per tick
+)
 
-// Populates the kills, mainclass and demoname fields
+func NewPlayer(d *Demo) *Player {
+	p := Player{Username: d.Header.Nick, Demo: d}
+	p.GetUserId()
+	p.GetClass()
+
+	return &p
+}
+
 func (p *Player) GetPlayerKills() error {
 	var userKills []Kill
+
 	for _, v := range p.Demo.State.Deaths {
 		if v.Killer != v.Victim {
 			if v.Killer == p.UserId {
@@ -52,8 +62,9 @@ func (p *Player) GetPlayerKills() error {
 
 	p.Kills = userKills
 	if len(p.Kills) <= 3 {
-		return fmt.Errorf("less than 3 kills found, aborting")
+		return errors.New("less than 3 kills found")
 	}
+
 	return nil
 }
 
@@ -64,6 +75,7 @@ func (p *Player) GetUserBookmarks() error {
 	}
 
 	lines := strings.Split(string(file), "\n")
+
 	for _, line := range lines {
 		if strings.Contains(line, p.Demo.Name) {
 			if strings.Contains(strings.ToLower(line), "bookmark") {
@@ -76,9 +88,11 @@ func (p *Player) GetUserBookmarks() error {
 			}
 		}
 	}
+
 	if len(p.Bookmarks) == 0 {
-		return fmt.Errorf("no bookmarks found")
+		return errors.New("no bookmarks found")
 	}
+
 	return nil
 }
 
@@ -87,25 +101,19 @@ func (p *Player) ProcessEvents() error {
 	bErr := p.GetUserBookmarks()
 
 	if kErr != nil && bErr != nil {
-		return fmt.Errorf("no killstreaks or bookmarks found")
+		return errors.New("no killstreaks or bookmarks found")
 	}
 
 	log.Println("Formatting and writing killstreaks.")
 	p.WriteEvents()
+
 	return nil
 }
 
-func NewPlayer(d *Demo) Player {
-	p := Player{Username: d.Header.Nick, Demo: d}
-	p.GetUserId()
-	p.GetClass()
-	return p
-}
-
-// Returns player's most used class
 func (p *Player) GetClass() {
 	maxNum := 0
 	var result int
+
 	for _, user := range p.Demo.State.Users {
 		if user.UserId == p.UserId {
 			for k, v := range user.Classes {
@@ -116,27 +124,30 @@ func (p *Player) GetClass() {
 			}
 		}
 	}
+
 	p.Class = classes[result]
 }
 
-func (p *Player) GetUserId() {
+func (p *Player) GetUserId() error {
 	for _, v := range p.Demo.State.Users {
 		if v.Name == p.Username {
 			p.UserId = v.UserId
 		}
 	}
+
+	if p.UserId == 0 {
+		return errors.New("could not get user id")
+	}
+
+	return nil
 }
 
-// Finds all killstreaks
 func (p *Player) GetUserKillstreaks() error {
-	err := p.GetPlayerKills()
-	if err != nil {
-		log.Println("Error:", err)
-		return err
+	if err := p.GetPlayerKills(); err != nil {
+		return fmt.Errorf("kills: %w", err)
 	}
 
 	lastKill := p.Kills[0]
-
 	killstreak := Killstreak{StartTick: lastKill.Tick}
 
 	for _, currentKill := range p.Kills[1:] {
@@ -154,15 +165,20 @@ func (p *Player) GetUserKillstreaks() error {
 		}
 		lastKill = currentKill
 	}
+
 	if len(p.Killstreaks) == 0 {
 		return errors.New("no killstreaks found")
 	}
+
 	return nil
 }
 
 func (p *Player) WriteEvents() {
-	file, err := os.OpenFile(p.Demo.EventsFile,
-		os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	file, err := os.OpenFile(
+		p.Demo.EventsFile,
+		os.O_APPEND|os.O_CREATE|os.O_RDWR,
+		0644,
+	)
 	if err != nil {
 		log.Println(err)
 	}
@@ -202,7 +218,7 @@ func (p *Player) WriteEvents() {
 		streaks = append(streaks, streak)
 	}
 
-	var lines []string
+	lines := make([]string, 0, len(header)+len(streaks)+len(bookmarks))
 	lines = append(lines, header)
 	lines = append(lines, streaks...)
 	lines = append(lines, bookmarks...)
@@ -211,6 +227,7 @@ func (p *Player) WriteEvents() {
 	for _, line := range lines {
 		file.WriteString(line)
 	}
+
 	file.WriteString(">\n")
 	log.Println("Done")
 }

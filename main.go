@@ -35,7 +35,7 @@ func formatDemos() {
 	for _, demo := range demos {
 		if strings.Contains(demo.Name(), ".dem") {
 			log.Println("------------------------------------------------")
-			log.Println("Processing:", demo.Name())
+			log.Println("Processing", demo.Name())
 			ProcessDemo(path.Join(demosDir, demo.Name()), demosDir)
 		}
 	}
