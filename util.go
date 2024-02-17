@@ -76,8 +76,7 @@ func ProcessDemo(demoPath string, demosDir string) error {
 	}
 
 	log.Println("Processing kills.")
-	err = demo.Player.ProcessEvents()
-	if err != nil {
+	if err = demo.Player.ProcessEvents(); err != nil {
 		return fmt.Errorf("demo: %w", err)
 	}
 
@@ -126,6 +125,22 @@ func WatchDemosDir() {
 			}
 		case err := <-watcher.Error:
 			log.Println("watcher:", err)
+		}
+	}
+}
+
+func FormatDemos() {
+	demosDir, err := GetDemosDir()
+	if err != nil {
+		panic(err)
+	}
+
+	demos, _ := os.ReadDir(demosDir)
+	for _, demo := range demos {
+		if strings.Contains(demo.Name(), ".dem") {
+			log.Println("------------------------------------------------")
+			log.Println("Processing", demo.Name())
+			ProcessDemo(path.Join(demosDir, demo.Name()), demosDir)
 		}
 	}
 }

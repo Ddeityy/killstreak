@@ -12,7 +12,7 @@ type Demo struct {
 	Path             string
 	Header           Header `json:"header"`
 	State            State  `json:"state"`
-	Player           *Player
+	Player           Player
 	Date             string
 	EventsFile       string
 	LegacyEventsFile string
@@ -78,7 +78,9 @@ func NewDemo(demoData string, demoPath string, demosDir string) (*Demo, error) {
 		return nil, err
 	}
 
-	p := NewPlayer(&demo)
+	p := Player{Username: demo.Header.Nick, Demo: &demo}
+	p.GetUserId()
+	p.GetClass()
 
 	demo.Player = p
 	demo.Path = demoPath

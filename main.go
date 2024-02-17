@@ -7,10 +7,6 @@ package main
 */
 import "C"
 import (
-	"log"
-	"os"
-	"path"
-	"strings"
 	"unsafe"
 )
 
@@ -23,20 +19,6 @@ func RustParseDemo(demoPath string) string {
 }
 
 func main() {
-	WatchDemosDir()
-}
-
-func formatDemos() {
-	demosDir, err := GetDemosDir()
-	if err != nil {
-		panic(err)
-	}
-	demos, _ := os.ReadDir(demosDir)
-	for _, demo := range demos {
-		if strings.Contains(demo.Name(), ".dem") {
-			log.Println("------------------------------------------------")
-			log.Println("Processing", demo.Name())
-			ProcessDemo(path.Join(demosDir, demo.Name()), demosDir)
-		}
-	}
+	//WatchDemosDir()
+	FormatDemos()
 }

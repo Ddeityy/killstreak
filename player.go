@@ -41,14 +41,6 @@ const (
 	tick         = 0.015 // Amount of seconds per tick
 )
 
-func NewPlayer(d *Demo) *Player {
-	p := Player{Username: d.Header.Nick, Demo: d}
-	p.GetUserId()
-	p.GetClass()
-
-	return &p
-}
-
 func (p *Player) GetPlayerKills() error {
 	var userKills []Kill
 
