@@ -19,6 +19,5 @@ func RustParseDemo(demoPath string) string {
 }
 
 func main() {
-	//WatchDemosDir()
-	FormatDemos()
+	WatchDemosDir()
 }
