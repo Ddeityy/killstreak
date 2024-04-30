@@ -24,7 +24,7 @@ func GetDemosDir() (string, error) {
 	steamDir := steamlocate.SteamDir{}
 	steamDir.Locate()
 
-	tfDir := steamDir.SteamApps.Apps[440].Path
+	tfDir := steamDir.LibraryFolders[0].SteamApps.Apps[440].Path
 	tfDir = path.Join(tfDir, "tf")
 	demosDir := path.Join(tfDir, "demos")
 
