@@ -74,7 +74,6 @@ func (p *Player) GetUserBookmarks() error {
 				ticks := strings.Split(line, " ")
 				tick := ticks[len(ticks)-1]
 				tick = strings.TrimSuffix(tick, ")")
-				log.Println(tick)
 				intTick, _ := strconv.Atoi(tick)
 				p.Bookmarks = append(p.Bookmarks, Bookmark{Tick: intTick})
 			}
