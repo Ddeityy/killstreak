@@ -2,14 +2,14 @@
 echo "Killing old service"
 systemctl --user -M $SUDO_USER@ stop killstreak.service
 echo "Copying the executables"
-cp bin/killstreak /home/$SUDO_USER/.local/share/
+cp bin/killstreak /home/$SUDO_USER/.local/bin/
 echo "Creating service file"
 sudo touch /etc/systemd/user/killstreak.service
-sudo bash -c 'cat' << EOF > /etc/systemd/user/killstreak.service --cut=$cut
+sudo bash -c 'cat' << EOF > /etc/systemd/user/killstreak.service
 [Unit]
 Description=Killstreak service
 [Service]
-ExecStart=/home/$SUDO_USER/.local/share/killstreak
+ExecStart=/home/$SUDO_USER/.local/bin/killstreak
 Restart=always
 [Install]
 WantedBy=default.target
