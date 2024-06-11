@@ -1,3 +1,5 @@
+# Deprecated. Rewritten in rust and integrated into [P-REC](https://github.com/ddeityy/rust-prec)
+
 # Better killstreaks for TF2
 
 ## Provides a more informative format for killstreaks.
